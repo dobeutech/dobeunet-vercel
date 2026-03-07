@@ -68,7 +68,7 @@ export function GlassmorphicHeader() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1">
-            {publicNavigation.slice(0, 5).map((item) => (
+            {publicNavigation.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}

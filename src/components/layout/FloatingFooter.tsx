@@ -88,7 +88,6 @@ export function FloatingFooter() {
                 { label: "About Us", href: "/about" },
                 { label: "Pricing", href: "/pricing" },
                 { label: "Contact", href: "/contact" },
-                { label: "Brand Kit", href: "/brand" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
