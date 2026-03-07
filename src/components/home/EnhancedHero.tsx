@@ -17,7 +17,7 @@ export function EnhancedHero() {
       source: "hero",
       text: "Start Your Project",
     });
-    window.open(typeformUrl, "_blank");
+    window.open(typeformUrl, "_blank", "noopener,noreferrer");
   };
 
   return (

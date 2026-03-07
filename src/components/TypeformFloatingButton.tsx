@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare } from "lucide-react";
 import { getTypeformDirectUrl } from "@/config/typeform";
