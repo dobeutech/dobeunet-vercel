@@ -31,10 +31,7 @@ export function TypeformButton({
 
   const handleClick = () => {
     trackEvent("Typeform Opened", { source, text });
-    const newWindow = window.open(typeformUrl, "_blank", "noopener,noreferrer");
-    if (newWindow) {
-      newWindow.opener = null;
-    }
+    window.open(typeformUrl, "_blank", "noopener,noreferrer");
   };
 
   const IconComponent =
