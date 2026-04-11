@@ -70,8 +70,8 @@ export function EnhancedHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <span className="block">Templates & tools</span>
-            <span className="block text-primary">for builders</span>
+            <span className="block">Build your</span>
+            <span className="block text-primary">digital product</span>
           </motion.h1>
 
           {/* Subtitle - clean and readable */}
@@ -81,8 +81,8 @@ export function EnhancedHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            Browse curated digital products, starter kits, and developer tools.
-            Everything you need to ship faster and build better.
+            We design and develop fast, modern websites and software that help
+            ambitious businesses grow and stand out.
           </motion.p>
 
           {/* CTA Buttons - clean, minimal */}
@@ -97,7 +97,7 @@ export function EnhancedHero() {
               onClick={handleStartProject}
               className="w-full sm:w-auto px-8 py-6 text-base font-medium rounded-lg flex items-center gap-2"
             >
-              Browse Store
+              Start Your Project
               <ArrowRight className="w-4 h-4" />
             </Button>
 
@@ -109,7 +109,7 @@ export function EnhancedHero() {
             >
               <Link to="/services" className="flex items-center gap-2">
                 <Play className="w-4 h-4" />
-                View All Products
+                Explore Services
               </Link>
             </Button>
           </motion.div>
@@ -123,19 +123,19 @@ export function EnhancedHero() {
           >
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">50+</span>
-              <span className="text-muted-foreground">Products available</span>
+              <span className="text-muted-foreground">Projects delivered</span>
             </div>
             <div className="hidden sm:block w-px h-8 bg-border" />
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">25+</span>
               <span className="text-muted-foreground">
-                Tech categories
+                Technology offerings
               </span>
             </div>
             <div className="hidden sm:block w-px h-8 bg-border" />
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">5+</span>
-              <span className="text-muted-foreground">Years curating</span>
+              <span className="text-muted-foreground">Years experience</span>
             </div>
           </motion.div>
         </div>

@@ -12,8 +12,34 @@ export default {
   prefix: "",
   theme: {
     fontFamily: {
-      sans: ["Nunito", "Quicksand", "system-ui", "-apple-system", "sans-serif"],
-      mono: ["JetBrains Mono", "Fira Code", "monospace"],
+      sans: [
+        "Inter",
+        "system-ui",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Helvetica Neue",
+        "Arial",
+        "Noto Sans",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji",
+      ],
+      mono: [
+        "JetBrains Mono",
+        "Fira Code",
+        "ui-monospace",
+        "SFMono-Regular",
+        "Menlo",
+        "Monaco",
+        "Consolas",
+        "Liberation Mono",
+        "Courier New",
+        "monospace",
+      ],
     },
     container: {
       center: true,
@@ -46,29 +72,34 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#6B5CE7",
-          hover: "#4A3FA8",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+          hover: "hsl(var(--primary-hover))",
+        },
+        yellow: {
+          400: "#facc15",
+          500: "#eab308",
+          600: "#ca8a04",
+        },
+        orange: {
+          500: "#f97316",
         },
         secondary: {
-          DEFAULT: "#E8E5FA",
-          foreground: "#4A3FA8",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+          hover: "hsl(var(--secondary-hover))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#F4A261",
-          foreground: "#1A1A2E",
-        },
-        cream: "#FFF8F0",
-        "dark-surface": "#1A1A2E",
-        "dark-elevated": "#242440",
-        destructive: {
-          DEFAULT: "#E07A5F",
-          foreground: "#FFFFFF",
-        },
-        success: "#4CAF50",
-        muted: {
-          DEFAULT: "#F5F5F7",
-          foreground: "#6B7280",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -78,40 +109,28 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "#6B5CE7",
-          "primary-foreground": "#FFFFFF",
-          accent: "#E8E5FA",
-          "accent-foreground": "#4A3FA8",
-          border: "#E0DFF5",
-          ring: "#6B5CE7",
-        },
-        dobeu: {
-          indigo: "#6B5CE7",
-          deep: "#4A3FA8",
-          amber: "#F4A261",
-          cream: "#FFF8F0",
-          dark: "#1A1A2E",
-          gray: "#2D2D3A",
-          "tint-indigo": "#E8E5FA",
-          "tint-amber": "#FEF0E0",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 8px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
         "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
         },
         "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
         },
         "gradient-x": {
           "0%, 100%": {
