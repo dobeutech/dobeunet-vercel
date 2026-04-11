@@ -16,7 +16,7 @@ export const SocialHeaderPreview = ({
   color,
 }: SocialHeaderPreviewProps) => (
   <div className="space-y-4">
-    <h4 className="text-sm text-gray-500 uppercase tracking-wider flex items-center gap-2">
+    <h4 className="text-sm text-muted-foreground uppercase tracking-wider flex items-center gap-2">
       {platform === "Twitter" && <Twitter size={16} />}
       {platform === "LinkedIn" && <Linkedin size={16} />}
       {platform === "Facebook" && <Facebook size={16} />}

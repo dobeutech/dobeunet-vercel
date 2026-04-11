@@ -1,27 +1,11 @@
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 interface LogoProps {
   variant?: "default" | "white" | "dark";
   className?: string;
 }
 
-// Try different logo file formats in order of preference
-const LOGO_SOURCES = [
-  "/logo.png",
-  "/logo.svg",
-  "/logo.webp",
-  "/logo.jpg",
-  "/logo.jpeg",
-];
-
-function SvgTextLogo({
-  variant,
-  className,
-}: {
-  variant: "default" | "white" | "dark";
-  className?: string;
-}) {
+export function Logo({ variant = "default", className }: LogoProps) {
   const fillColor =
     variant === "white"
       ? "#FFFFFF"
@@ -49,33 +33,5 @@ function SvgTextLogo({
         DOBEU
       </text>
     </svg>
-  );
-}
-
-export function Logo({ variant = "default", className }: LogoProps) {
-  const [currentSrcIndex, setCurrentSrcIndex] = useState(0);
-  const [imageError, setImageError] = useState(false);
-
-  // If all image sources failed, show SVG fallback
-  if (imageError || currentSrcIndex >= LOGO_SOURCES.length) {
-    return <SvgTextLogo variant={variant} className={className} />;
-  }
-
-  const logoSrc = LOGO_SOURCES[currentSrcIndex];
-
-  return (
-    <img
-      src={logoSrc}
-      alt="DOBEU Logo"
-      className={cn("h-8 w-auto object-contain", className)}
-      onError={() => {
-        // Try next logo source
-        if (currentSrcIndex < LOGO_SOURCES.length - 1) {
-          setCurrentSrcIndex(currentSrcIndex + 1);
-        } else {
-          setImageError(true);
-        }
-      }}
-    />
   );
 }
