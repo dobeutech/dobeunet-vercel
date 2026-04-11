@@ -1,16 +1,16 @@
 {
-  "name": "Dobeu Store — Templates and Tools for Builders",
-  "short_name": "Dobeu Store",
-  "description": "Templates and tools for builders. Browse curated digital products, starter kits, and developer tools.",
+  "name": "DOBEU - Transform Your Digital Vision",
+  "short_name": "DOBEU",
+  "description": "Expert web development, software solutions, and strategic consulting to elevate your business in the digital age.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
-  "theme_color": "#6B5CE7",
+  "background_color": "#000000",
+  "theme_color": "#FACC15",
   "orientation": "portrait-primary",
   "lang": "en",
   "dir": "ltr",
   "scope": "/",
-  "id": "dobeu-store",
+  "id": "dobeu-app",
   "icons": [
     {
       "src": "/icon.svg",
@@ -46,10 +46,10 @@
       "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
-      "name": "Shop",
-      "short_name": "Shop",
-      "description": "Browse the store",
-      "url": "/shop",
+      "name": "Services",
+      "short_name": "Services",
+      "description": "Browse services",
+      "url": "/services",
       "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]

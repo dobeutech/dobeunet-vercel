@@ -92,13 +92,13 @@ export function Pricing() {
                   "h-full p-6 rounded-xl border",
                   "transition-all duration-200",
                   option.popular
-                    ? "border-primary bg-cream"
+                    ? "border-primary bg-primary/5"
                     : "border-border bg-card hover:border-primary/30",
                 )}
               >
                 {/* Popular badge */}
                 {option.popular && (
-                  <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-accent text-accent-foreground mb-4">
+                  <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary text-primary-foreground mb-4">
                     Most Popular
                   </div>
                 )}

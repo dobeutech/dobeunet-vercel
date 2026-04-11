@@ -10,8 +10,8 @@ export default function Home() {
     <>
       <PageMeta
         title="Home"
-        description="Templates and tools for builders. Browse curated digital products, starter kits, and developer tools at dobeu.store."
-        keywords="templates, tools, builders, developer tools, starter kits, digital products, software marketplace"
+        description="Transform your business with custom web solutions. DOBEU builds fast, modern websites and software that help you grow and serve customers better."
+        keywords="web development, custom websites, software development, business growth, modern web solutions, responsive design"
       />
       <EnhancedHero />
       <Mission />

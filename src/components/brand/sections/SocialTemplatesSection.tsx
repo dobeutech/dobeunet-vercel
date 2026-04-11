@@ -16,8 +16,8 @@ export function SocialTemplatesSection() {
           platform="Instagram Post"
           dimensions="1080x1080px"
           preview={
-            <div className="w-64 h-64 bg-gradient-to-br from-dobeu-indigo to-dobeu-deep rounded-lg flex items-center justify-center">
-              <Logo className="h-12" />
+            <div className="w-64 h-64 bg-gradient-to-br from-primary to-primary/60 rounded-lg flex items-center justify-center">
+              <Logo variant="white" className="h-12" />
             </div>
           }
         />
@@ -52,8 +52,8 @@ export function SocialTemplatesSection() {
           platform="Instagram Story"
           dimensions="1080x1920px"
           preview={
-            <div className="w-36 h-64 bg-gradient-to-b from-dobeu-indigo to-dobeu-deep rounded-lg flex items-center justify-center">
-              <Logo className="h-10" />
+            <div className="w-36 h-64 bg-gradient-to-b from-primary to-primary/80 rounded-lg flex items-center justify-center">
+              <Logo variant="white" className="h-10" />
             </div>
           }
         />
@@ -61,8 +61,8 @@ export function SocialTemplatesSection() {
           platform="LinkedIn Banner"
           dimensions="1584x396px"
           preview={
-            <div className="w-64 h-16 bg-gradient-to-r from-dobeu-indigo via-dobeu-deep to-dobeu-indigo rounded-lg flex items-center justify-center">
-              <Logo className="h-8" />
+            <div className="w-64 h-16 bg-gradient-to-r from-primary via-primary/80 to-primary rounded-lg flex items-center justify-center">
+              <Logo variant="white" className="h-8" />
             </div>
           }
         />

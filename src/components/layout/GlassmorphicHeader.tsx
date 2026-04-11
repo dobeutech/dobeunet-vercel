@@ -60,7 +60,7 @@ export function GlassmorphicHeader() {
           <Link
             to="/"
             className="flex items-center"
-            aria-label="Dobeu Store Home"
+            aria-label="DOBEU Home"
             onClick={() => handleNavClick("Logo", "/")}
           >
             <Logo className="h-7" />
