@@ -41,9 +41,6 @@ export function RippleGrid({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Resolve CSS custom properties so Canvas 2D can use the color
-    const resolvedColor = resolveColor(dotColor);
-
     let time = 0;
 
     const resize = () => {
@@ -55,6 +52,10 @@ export function RippleGrid({
     };
 
     const draw = () => {
+      // Resolve CSS custom properties each frame so the color updates
+      // when the theme toggles (e.g. dark/light mode)
+      const resolvedColor = resolveColor(dotColor);
+
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
 
