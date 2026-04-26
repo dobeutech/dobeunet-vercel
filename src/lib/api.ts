@@ -10,10 +10,8 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    // Use Netlify Functions URL in production, localhost in development
-    this.baseUrl = import.meta.env.PROD
-      ? "/.netlify/functions"
-      : "http://localhost:8888/.netlify/functions";
+    // Use Vercel API routes in production, Vercel dev server in development
+    this.baseUrl = "/api";
   }
 
   private getHeaders(): HeadersInit {

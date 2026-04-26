@@ -66,15 +66,9 @@ export default function Files() {
   const handleDownload = async (file: ClientFile) => {
     try {
       const token = await getAccessToken();
-      const baseUrl = import.meta.env.PROD
-        ? "/.netlify/functions"
-        : "http://localhost:8888/.netlify/functions";
-      const response = await fetch(
-        `${baseUrl}/files?id=${file.id}&download=true`,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        },
-      );
+      const response = await fetch(`/api/files?id=${file.id}&download=true`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
 
       if (!response.ok) {
         throw new Error("Failed to download file");
