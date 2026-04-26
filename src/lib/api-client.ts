@@ -165,10 +165,8 @@ export class NetlifyFunctionsClient {
   private getToken: (() => Promise<string | null>) | null = null;
 
   constructor(getTokenFn?: () => Promise<string | null>) {
-    // Use Netlify Functions URL in production, localhost in development
-    this.baseUrl = import.meta.env.PROD
-      ? "/.netlify/functions"
-      : "http://localhost:8888/.netlify/functions";
+    // Use Vercel API routes (works in both dev and production via vercel dev)
+    this.baseUrl = "/api";
     this.getToken = getTokenFn || null;
   }
 

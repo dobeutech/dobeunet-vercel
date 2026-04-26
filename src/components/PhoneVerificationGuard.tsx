@@ -30,14 +30,11 @@ export function PhoneVerificationGuard({
           return;
         }
 
-        const response = await fetch(
-          "/.netlify/functions/check-phone-verification",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch("/api/check-phone-verification", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         if (response.ok) {
           const data = await response.json();

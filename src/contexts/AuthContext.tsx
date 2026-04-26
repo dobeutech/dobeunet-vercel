@@ -104,14 +104,11 @@ function AuthContextInner({ children }: { children: React.ReactNode }) {
         const token = await getAccessTokenSilently();
         if (!token) return;
 
-        const response = await fetch(
-          "/.netlify/functions/check-phone-verification",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch("/api/check-phone-verification", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         if (response.ok) {
           const data = await response.json();

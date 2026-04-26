@@ -50,14 +50,11 @@ export default function VerifyPhone() {
         return;
       }
 
-      const response = await fetch(
-        "/.netlify/functions/check-phone-verification",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch("/api/check-phone-verification", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -97,17 +94,14 @@ export default function VerifyPhone() {
         return;
       }
 
-      const response = await fetch(
-        "/.netlify/functions/send-sms-verification",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ phone }),
+      const response = await fetch("/api/send-sms-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ phone }),
+      });
 
       const data = await response.json();
 
@@ -162,7 +156,7 @@ export default function VerifyPhone() {
         return;
       }
 
-      const response = await fetch("/.netlify/functions/verify-sms-code", {
+      const response = await fetch("/api/verify-sms-code", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -208,17 +202,14 @@ export default function VerifyPhone() {
       const token = await getAccessToken();
       if (!token) return;
 
-      const response = await fetch(
-        "/.netlify/functions/send-sms-verification",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ phone }),
+      const response = await fetch("/api/send-sms-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify({ phone }),
+      });
 
       if (response.ok) {
         setCountdown(10 * 60);
