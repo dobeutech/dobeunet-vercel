@@ -22,10 +22,10 @@ Total surface area: ~18 serverless functions, ~50 markdown docs, the Tailwind/CS
 **What changes:**
 
 - Add `vercel.json` (Vite framework preset, SPA rewrites, the `/es` and `/fr` lang rewrites, and every header from `netlify.toml` ported verbatim — CSP, HSTS, X-Frame-Options, asset cache-control, no-cache for HTML).
-- Migrate all 18 handlers in `netlify/functions/*.ts` to `api/*.ts` using `@vercel/node` types. Shared helpers (`_http.ts`, `_auth0.ts`, `_supabase.ts`) refactored once; per-function changes are mechanical (signature swap from `Handler` to `(req, res)`).
+- Migrate all 18 handlers in `netlify/functions/*.ts` to `api/*.ts` using `@vercel/node` types (added to `devDependencies` in the same PR). Shared helpers (`_http.ts`, `_auth0.ts`, `_supabase.ts`) refactored once; per-function changes are mechanical (signature swap from `Handler` to `(req, res)`).
 - Drop the `@netlify/functions` dependency. Delete `netlify.toml`, `netlify/`, `NETLIFY_DEPLOYMENT.md`, and Netlify language across ~20 docs and 6 source files.
 - Vercel project bootstrap via `npx vercel link/deploy` using the `VERCEL_PAT` already present in our deployment environment. No Vercel UI clicks required from you.
-- Production env vars (Supabase, Auth0, Typeform, Stripe, Twilio, Intercom, Datadog, PostHog) need to be set in the Vercel project — I'll provide the exact list and pull values from our existing Netlify environment for parity.
+- **Mandatory secret rotation, not transfer.** A scan during planning surfaced an exposed Netlify PAT committed in `NETLIFY_DEPLOYMENT.md` (line 14). All production secrets — Supabase service keys, Auth0 client secrets, Typeform, Stripe, Twilio, Intercom, Datadog, PostHog, and the Netlify PAT itself — will be rotated at the source provider before being seeded into the Vercel project. Rotation is a Phase 1 acceptance criterion; we do not pull existing values for parity. Anon/publishable keys (Supabase anon, Stripe publishable) are safe to reuse.
 
 **Risk:** low. The function logic does not change; only the request/response shape adapter. CSP and security headers are preserved 1:1.
 
@@ -102,10 +102,10 @@ After production deploy I will run automated post-launch checks: `WebFetch` agai
 
 ## 6. Decisions I need from you, in priority order
 
-1. ✅ **Approve Harbor palette + Fraunces type pairing** (or counter-propose). *Blocks Phase 2 PR.*
-2. ✅ **Confirm logo is out of scope** for this release.
-3. ✅ **Confirm PR strategy**: I'm planning **three sequential PRs** (Phase 1, then 2, then 3) so reviewers can isolate concerns. Let me know if you want them combined.
-4. ✅ **Approve the production env-var transfer** from the Netlify project to Vercel (I'll list values for you to confirm before they land in Vercel).
+1. [ ] **Approve Harbor palette + Fraunces type pairing** (or counter-propose). *Blocks Phase 2 PR.*
+2. [ ] **Confirm logo is out of scope** for this release.
+3. [ ] **Confirm PR strategy**: I'm planning **three sequential PRs** (Phase 1, then 2, then 3) so reviewers can isolate concerns. Let me know if you want them combined.
+4. [ ] **Approve the production secret rotation + env-var seeding** plan for Vercel (I'll list every secret to be rotated and confirm with you before any Vercel-side change).
 
 ---
 
