@@ -63,17 +63,10 @@ export function Logo({ variant = "default", className }: LogoProps) {
       alt="DOBEU Logo"
       className={cn("h-8 w-auto object-contain", className)}
       onError={() => {
-        // Use functional updaters to avoid stale closure issues
-        // when multiple errors fire quickly.
-        setCurrentSrcIndex((index) => {
-          if (index < LOGO_SOURCES.length - 1) {
-            return index + 1;
-          }
-          return index;
-        });
-        setImageError(
-          (prev) => prev || currentSrcIndex >= LOGO_SOURCES.length - 1,
-        );
+        // Advance to the next source. If all sources are exhausted the
+        // `currentSrcIndex >= LOGO_SOURCES.length` guard above will
+        // render the SVG fallback on the next render.
+        setCurrentSrcIndex((index) => index + 1);
       }}
     />
   );
