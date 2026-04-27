@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Currently there are **9 open PRs** in the repository. This document provides a consolidation strategy to reduce them to **1 primary PR** while preserving important work.
+Currently there are **10 open PRs** in the repository. This document provides a consolidation strategy to reduce them to **4 focused open PRs** while preserving important work.
 
 ## Current Open PRs Analysis
 
@@ -32,12 +32,16 @@ Currently there are **9 open PRs** in the repository. This document provides a c
 - **PR #83** - bump @tanstack/react-query from 5.90.12 to 5.90.15
 - **PR #84** - bump qs from 6.14.0 to 6.14.1 (security fix)
 
-**Recommendation**: ✅ **Merge all dependency updates** into a single consolidated PR
+**Recommendation**:
+- ✅ **Merge PR #84 first** as a standalone security update
+- ✅ **Optionally consolidate PRs #81, #82, and #83** into a single low-risk dependency PR
+- ⚠️ **Review PR #80 separately** because the Stripe upgrade is a major version bump and may require code changes or additional testing
 
 **Reasoning**:
-- All are safe, automated dependency updates
-- PR #84 contains a security fix and should be prioritized
-- Combining them reduces PR noise and simplifies review
+- PR #84 contains a security fix and should be prioritized for faster review and release
+- PRs #81, #82, and #83 are patch/minor Dependabot updates and are better candidates for consolidation
+- PR #80 moves Stripe from 14.x to 20.x, which is potentially breaking and should not be treated as equivalent to patch/minor updates
+- Separating the major upgrade reduces review risk while still keeping low-risk dependency maintenance efficient
 
 ### Category 3: Vercel Migration
 - **PR #89** (Draft) - "docs: KT addendum for Vercel migration, brand v3, and CI/CD overhaul"
@@ -62,16 +66,15 @@ Currently there are **9 open PRs** in the repository. This document provides a c
 
 **Result**: 3 PRs → 1 PR
 
-### Phase 2: Consolidate Dependency Updates ⚡ Priority: HIGH
+### Phase 2: Address Dependency Updates ⚡ Priority: HIGH
 
 **Actions**:
-1. Create a new branch: `chore/consolidate-dependency-updates`
-2. Cherry-pick all 5 dependency updates into one PR
-3. Prioritize the security fix from PR #84 in the description
-4. ❌ Close PRs #80, #81, #82, #83, #84 after consolidation
-5. ✅ Create single PR: "chore(deps): consolidate dependency updates"
+1. ✅ Merge PR #84 immediately as a standalone security fix
+2. ✅ Create a consolidated branch `chore/consolidate-dependency-updates` cherry-picking PRs #81, #82, and #83 (patch/minor updates)
+3. ❌ Close original PRs #81, #82, #83 once the consolidated PR is merged
+4. ⚠️ Review and merge PR #80 (Stripe 14.x → 20.x major bump) separately after verifying no breaking changes
 
-**Result**: 5 PRs → 1 PR
+**Result**: 5 PRs → 2 PRs (consolidated patch/minor PR + standalone Stripe major-bump PR)
 
 ### Phase 3: Document Vercel Migration Status ⚡ Priority: MEDIUM
 
@@ -85,18 +88,20 @@ Currently there are **9 open PRs** in the repository. This document provides a c
 
 ## Final State
 
-### Before Consolidation: 9 Open PRs
-- Bug fixes: 3 PRs
-- Dependencies: 5 PRs
-- Vercel migration: 2 PRs (draft)
+### Before Consolidation: 10 Open PRs
+- Bug fixes: 3 PRs (#86, #87, #88)
+- Dependencies: 5 PRs (#80, #81, #82, #83, #84)
+- Vercel migration: 2 PRs (draft, #89, #90)
 
 ### After Consolidation: 4 Open PRs
 - ✅ PR #88: Bug fixes from PR #85
 - ✅ PR #89: Vercel migration docs (draft)
 - ✅ PR #90: Vercel migration implementation (draft)
-- ✅ New consolidated PR: All dependency updates
+- ✅ New consolidated PR: Patch/minor dependency updates (#81, #82, #83)
 
-**Reduction**: 9 PRs → 4 PRs (56% reduction)
+> ⚠️ PR #80 (Stripe major bump) is handled as a separate, dedicated review and is not counted in the target state until tested and approved.
+
+**Reduction**: 10 PRs → 4 PRs (60% reduction)
 
 ## Alternative: Single Mega-PR Approach
 
@@ -111,7 +116,7 @@ If the goal is to have only 1 PR total, we would need to:
 
 3. Close all other PRs
 
-**Final state**: 3 PRs (1 consolidated + 2 Vercel draft PRs)
+**Final state**: 3 PRs (1 consolidated bug fix + deps + 2 Vercel draft PRs)
 
 ## Recommendations by Priority
 
@@ -132,24 +137,28 @@ If the goal is to have only 1 PR total, we would need to:
 ## Implementation Commands
 
 ```bash
-# Close duplicate bug fix PRs
+# Phase 1: Close duplicate bug fix PRs
 gh pr close 86 --comment "Duplicate of PR #88 which has better code quality"
 gh pr close 87 --comment "Includes rebrand already reverted. Bug fixes in PR #88"
 
 # Merge PR #88 (bug fixes)
 gh pr merge 88 --squash --delete-branch
 
-# Merge dependency updates individually (fastest approach)
-gh pr merge 84 --squash --delete-branch  # Security fix first
-gh pr merge 83 --squash --delete-branch
-gh pr merge 82 --squash --delete-branch
-gh pr merge 81 --squash --delete-branch
-gh pr merge 80 --squash --delete-branch
+# Phase 2a: Merge security fix immediately (standalone)
+gh pr merge 84 --squash --delete-branch  # Security fix — highest priority
 
-# OR create consolidated dependency PR (cleaner but more work)
-git checkout -b chore/consolidate-deps
-# Cherry-pick all dependency updates
-gh pr create --title "chore(deps): consolidate dependency updates"
+# Phase 2b: Consolidate patch/minor dependency updates (#81, #82, #83)
+git checkout -b chore/consolidate-dependency-updates
+# Cherry-pick the changes from PRs #81, #82, and #83
+gh pr create --title "chore(deps): consolidate patch/minor dependency updates (#81, #82, #83)"
+# After the consolidated PR is merged, close the originals:
+gh pr close 83 --comment "Included in consolidated dependency PR"
+gh pr close 82 --comment "Included in consolidated dependency PR"
+gh pr close 81 --comment "Included in consolidated dependency PR"
+
+# Phase 2c: Review Stripe major bump separately (after testing for breaking changes)
+# PR #80 bumps Stripe from 14.x to 20.x — verify API compatibility before merging
+gh pr merge 80 --squash --delete-branch
 ```
 
 ## Success Criteria
@@ -158,14 +167,16 @@ gh pr create --title "chore(deps): consolidate dependency updates"
 - ✅ All security updates merged
 - ✅ Clear separation between bug fixes, dependencies, and feature work
 - ✅ Vercel migration PRs remain in draft until stakeholder approval
-- ✅ PR count reduced from 9 to 4 (or 3 with mega-consolidation)
+- ✅ PR count reduced from 10 to 4 (or 3 with mega-consolidation)
+- ✅ Stripe major-version bump (PR #80) reviewed independently with testing
 
 ## Notes
 
 - The Vercel migration PRs (#89, #90) should remain open as they're awaiting stakeholder review
 - All bug fix PRs target the same issues - only one is needed
-- Dependency updates can be merged immediately as they're automated and low-risk
-- PR #84 includes a security fix and should be prioritized
+- PR #84 includes a security fix and should be merged immediately
+- PRs #81, #82, and #83 are patch/minor updates safe to consolidate
+- PR #80 bumps Stripe from 14.x to 20.x — this is a **major version bump** and must be reviewed and tested independently before merging
 
 ---
 
