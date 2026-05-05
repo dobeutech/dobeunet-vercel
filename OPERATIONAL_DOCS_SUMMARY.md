@@ -39,7 +39,7 @@ Three comprehensive operational documents have been created in the `docs/` direc
 - **Size:** ~600 lines
 - **Covers:**
   - Netlify monitoring setup
-  - MongoDB Atlas alerts
+  - Supabase Postgres (db-dobeutech-unified) alerts
   - PostHog error tracking
   - Uptime monitoring
   - Log aggregation
@@ -82,7 +82,7 @@ netlify rollback
 2. **Authentication Failures** (P1)
    - Auth0 issues, token problems, CORS errors
 3. **Database Connection Failures** (P1)
-   - MongoDB Atlas issues, connection pool, certificates
+   - Supabase Postgres (db-dobeutech-unified) issues, connection pool, certificates
 4. **Build Failures** (P2)
    - Dependency conflicts, TypeScript errors, memory issues
 5. **Function Timeouts** (P1)
@@ -97,7 +97,7 @@ netlify rollback
 **Complete monitoring setup for:**
 
 - Netlify (deploys, functions, bandwidth)
-- MongoDB Atlas (connections, queries, performance)
+- Supabase Postgres (db-dobeutech-unified) (connections, queries, performance)
 - PostHog (errors, sessions, user behavior)
 - Uptime monitoring (UptimeRobot/Pingdom)
 - Custom health checks
@@ -181,11 +181,11 @@ netlify deploy --prod --dir=dist            # Deploy to production
 netlify rollback                            # Rollback to previous deploy
 ```
 
-### MongoDB
+### Supabase
 
 ```bash
 # Connect to database
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
+psql "$SUPABASE_URL" \
   --tls --tlsCAFile <cert.pem> --tlsCertificateKeyFile <cert.pem>
 
 # Check connection count
@@ -306,14 +306,14 @@ git push origin main
 ### Dashboards
 
 - [Netlify Dashboard](https://app.netlify.com/projects/dobeutech)
-- [MongoDB Atlas](https://cloud.mongodb.com/)
+- [Supabase Postgres (db-dobeutech-unified)](https://supabase.com/dashboard/)
 - [PostHog](https://us.posthog.com/)
 - [Auth0](https://manage.auth0.com/)
 
 ### Status Pages
 
 - [Netlify Status](https://www.netlifystatus.com/)
-- [MongoDB Status](https://status.mongodb.com/)
+- [Supabase Status](https://status.supabase.com/)
 - [Auth0 Status](https://status.auth0.com/)
 
 ---

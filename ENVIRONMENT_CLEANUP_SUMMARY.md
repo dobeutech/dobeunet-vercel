@@ -55,16 +55,16 @@ Review all Ona environments, merge pending work, and clean up unused environment
 
 **Total Tests:** 111+ comprehensive tests
 
-#### 2. MongoDB Cost Analysis (3 files)
+#### 2. Supabase Cost Analysis (3 files)
 
 **Documentation:**
 
-- `MONGODB_COST_ANALYSIS.md` - Complete cost breakdown (~500 lines)
-- `MONGODB_COST_SUMMARY.md` - Quick reference (~200 lines)
+- `SUPABASE_MIGRATION_NOTES.md` - Complete cost breakdown (~500 lines)
+- `SUPABASE_MIGRATION_NOTES.md` - Quick reference (~200 lines)
 
 **Scripts:**
 
-- `scripts/mongodb-optimize.js` - Automated optimization script
+- `scripts/supabase-optimize.ts` - Automated optimization script
 
 **Key Insights:**
 
@@ -197,11 +197,11 @@ nothing to commit, working tree clean
 2. **TESTING_QUICK_REFERENCE.md** - Quick reference card
 3. **TESTING_IMPLEMENTATION_SUMMARY.md** - Implementation details
 
-### MongoDB Costs
+### Supabase Costs
 
-1. **MONGODB_COST_ANALYSIS.md** - Full cost breakdown
-2. **MONGODB_COST_SUMMARY.md** - Quick reference
-3. **scripts/mongodb-optimize.js** - Optimization script
+1. **SUPABASE_MIGRATION_NOTES.md** - Full cost breakdown
+2. **SUPABASE_MIGRATION_NOTES.md** - Quick reference
+3. **scripts/supabase-optimize.ts** - Optimization script
 
 ### System Analysis
 
@@ -229,7 +229,7 @@ nothing to commit, working tree clean
 2. **Run Optimizations**
 
    ```bash
-   node scripts/mongodb-optimize.js
+   node scripts/supabase-optimize.ts
    ```
 
 3. **Implement Quick Wins**

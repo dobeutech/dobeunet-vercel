@@ -194,7 +194,7 @@ npm update vitest@latest
 
 **Action:**
 
-- Document that these are optional (app uses MongoDB + Auth0)
+- Document that these are optional (app uses Supabase + Auth0)
 - Update `.env.example` with clear comments
 - Update `src/config/env.ts` validation messages
 

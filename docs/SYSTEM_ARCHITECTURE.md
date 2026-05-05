@@ -424,7 +424,7 @@ graph LR
     subgraph "Monitoring"
         Netlify[Netlify Logs]
         PostHog[PostHog Events]
-        Atlas[MongoDB Metrics]
+        Atlas[Supabase Metrics]
     end
 
     Dev --> Git
@@ -474,7 +474,7 @@ graph TB
     end
 
     subgraph "Database"
-        Mongo[MongoDB Atlas]
+        Mongo[Supabase Postgres (db-dobeutech-unified)]
     end
 
     App --> AuthSDK
@@ -556,7 +556,7 @@ graph TB
     end
 
     subgraph "Database"
-        Atlas[MongoDB Atlas]
+        Atlas[Supabase Postgres (db-dobeutech-unified)]
         GridFS[GridFS]
         Indexes[Indexes]
     end
@@ -649,7 +649,7 @@ graph TB
     end
 
     subgraph "Database Monitoring"
-        Atlas[MongoDB Atlas]
+        Atlas[Supabase Postgres (db-dobeutech-unified)]
         Perf[Performance Advisor]
         Slow[Slow Query Logs]
     end
@@ -703,9 +703,9 @@ graph TB
     end
 
     subgraph "Database"
-        Primary[MongoDB Primary]
-        Secondary1[MongoDB Secondary 1]
-        Secondary2[MongoDB Secondary 2]
+        Primary[Supabase Primary]
+        Secondary1[Supabase Secondary 1]
+        Secondary2[Supabase Secondary 2]
     end
 
     Domain --> Netlify
@@ -731,14 +731,14 @@ graph TB
     subgraph "Horizontal Scaling"
         CDN[CDN Edge Nodes]
         Functions[Serverless Functions]
-        DB[MongoDB Sharding]
+        DB[Supabase Sharding]
     end
 
     subgraph "Caching"
         Browser[Browser Cache]
         CDNCache[CDN Cache]
         QueryCache[React Query Cache]
-        DBCache[MongoDB Cache]
+        DBCache[Supabase Cache]
     end
 
     subgraph "Optimization"

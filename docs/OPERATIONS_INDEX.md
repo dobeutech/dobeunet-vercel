@@ -142,7 +142,7 @@ netlify logs:function --name=<function-name>
 # Deploy logs
 netlify logs:deploy
 
-# MongoDB logs
+# Supabase logs
 # Atlas Dashboard → Metrics → Logs
 ```
 
@@ -191,20 +191,20 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 ### Dashboards
 
 - **Netlify:** https://app.netlify.com/projects/dobeutech
-- **MongoDB Atlas:** https://cloud.mongodb.com/
+- **Supabase Postgres (db-dobeutech-unified):** https://cloud.mongodb.com/
 - **PostHog:** https://us.posthog.com/
 - **Auth0:** https://manage.auth0.com/
 
 ### Status Pages
 
 - **Netlify Status:** https://www.netlifystatus.com/
-- **MongoDB Status:** https://status.mongodb.com/
+- **Supabase Status:** https://status.mongodb.com/
 - **Auth0 Status:** https://status.auth0.com/
 
 ### Documentation
 
 - **Netlify Docs:** https://docs.netlify.com/
-- **MongoDB Docs:** https://docs.mongodb.com/
+- **Supabase Docs:** https://docs.mongodb.com/
 - **Auth0 Docs:** https://auth0.com/docs/
 
 ---
@@ -223,7 +223,7 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 ### Weekly Review
 
 - [ ] Review error rates in PostHog
-- [ ] Check MongoDB performance metrics
+- [ ] Check Supabase performance metrics
 - [ ] Review slow queries
 - [ ] Check disk space
 - [ ] Review function performance
@@ -274,7 +274,7 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 
 **Scenario 2: Database Connection Failure**
 
-- Trigger: MongoDB connection errors
+- Trigger: Supabase connection errors
 - Practice: Diagnostic steps, certificate renewal
 - Time limit: 15 minutes
 
@@ -326,7 +326,7 @@ When updating documentation:
 **By Component:**
 
 - Netlify → [Runbook → Architecture](./OPERATIONAL_RUNBOOK.md#architecture)
-- MongoDB → [Runbook → Database Failures](./OPERATIONAL_RUNBOOK.md#3-database-connection-failures)
+- Supabase → [Runbook → Database Failures](./OPERATIONAL_RUNBOOK.md#3-database-connection-failures)
 - Auth0 → [Runbook → Authentication Failures](./OPERATIONAL_RUNBOOK.md#2-authentication-failures)
 
 **By Task:**

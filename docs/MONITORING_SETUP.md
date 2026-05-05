@@ -66,7 +66,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 
 ---
 
-## 2. MongoDB Atlas Monitoring
+## 2. Supabase Postgres (db-dobeutech-unified) Monitoring
 
 ### Performance Alerts
 
@@ -112,7 +112,7 @@ Action: Email + PagerDuty
 **Enable Profiler:**
 
 ```javascript
-// In MongoDB shell
+// In Supabase shell
 use admin
 db.setProfilingLevel(1, { slowms: 100 })
 
@@ -354,9 +354,9 @@ export const handler: Handler = async () => {
     checks: {} as Record<string, any>,
   };
 
-  // Check MongoDB
+  // Check Supabase
   try {
-    const client = new MongoClient(process.env.MONGODB_URI!);
+    const client = new MongoClient(process.env.SUPABASE_URL!);
     await client.connect();
     await client.db().admin().ping();
     await client.close();
@@ -427,7 +427,7 @@ export const handler: Handler = async () => {
 - Error rate > 5% for 10 minutes
 - Function timeout rate > 20%
 - Response time > 5s (p95)
-- MongoDB connections > 200
+- Supabase connections > 200
 
 **P2 Alerts:**
 
@@ -534,13 +534,13 @@ Alert: > 150
 
 - [ ] Check Netlify deploy status
 - [ ] Review error logs in PostHog
-- [ ] Check MongoDB connection count
+- [ ] Check Supabase connection count
 - [ ] Review slow queries in Atlas
 
 **Weekly:**
 
 - [ ] Review Lighthouse scores
-- [ ] Check disk space in MongoDB
+- [ ] Check disk space in Supabase
 - [ ] Review function performance metrics
 - [ ] Update monitoring dashboards
 
@@ -603,7 +603,7 @@ GROUP BY distinct_id
 HAVING error_count > 5
 ```
 
-### MongoDB Queries
+### Supabase Queries
 
 ```javascript
 // Find slow queries

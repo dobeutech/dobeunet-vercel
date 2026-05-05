@@ -73,17 +73,17 @@ netlify deploy --prod
 **Quick Checks:**
 
 ```bash
-# 1. Check MongoDB Atlas status
-# Visit: https://status.mongodb.com/
+# 1. Check Supabase Postgres (db-dobeutech-unified) status
+# Visit: https://status.supabase.com/
 
 # 2. Test connection
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
+psql "$SUPABASE_URL" \
   --tls \
   --tlsCAFile <cert.pem> \
   --tlsCertificateKeyFile <cert.pem>
 
 # 3. Check function logs
-netlify logs:function --name=projects | grep -i "mongo\|connection\|timeout"
+netlify logs:function --name=projects | grep -i "supabase\|connection\|timeout"
 ```
 
 **Common Fixes:**
@@ -132,7 +132,7 @@ netlify rollback
 # 3. Redeploy
 
 # If rate limiting:
-# - Check MongoDB connection count
+# - Check Supabase connection count
 # - Check function invocation count
 # - Scale if needed
 ```
@@ -222,8 +222,8 @@ netlify env:list
    - URL: https://us.posthog.com/
    - Check: Error events, session recordings, user flows
 
-3. **MongoDB Atlas**
-   - URL: https://cloud.mongodb.com/
+3. **Supabase Postgres (db-dobeutech-unified)**
+   - URL: https://supabase.com/dashboard/
    - Check: Connection count, slow queries, storage
 
 4. **Browser Console**
@@ -316,7 +316,7 @@ netlify status && echo "✅ Netlify OK"
 netlify logs:function --name=<function> | grep ERROR | tail -20
 
 # Test database connection
-mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_URL" --eval "db.runCommand({ping:1})"
 
 # Deploy to production
 export NETLIFY_AUTH_TOKEN="<token>"

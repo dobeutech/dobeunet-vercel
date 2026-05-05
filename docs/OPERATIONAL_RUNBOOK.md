@@ -57,7 +57,7 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 1. User requests → Netlify Edge (CDN)
 2. Static assets served from CDN
 3. API calls → Netlify Functions
-4. Functions → MongoDB Atlas (X.509 auth)
+4. Functions → Supabase Postgres (db-dobeutech-unified) (X.509 auth)
 5. Auth → Auth0 (OAuth2/OIDC)
 
 ---
@@ -72,9 +72,9 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 - Metrics: Deploy status, function invocations, bandwidth
 - Access: Team login required
 
-**MongoDB Atlas Dashboard**
+**Supabase Postgres (db-dobeutech-unified) Dashboard**
 
-- URL: https://cloud.mongodb.com/
+- URL: https://supabase.com/dashboard/
 - Metrics: Connection count, query performance, storage
 - Access: X.509 certificate required
 
@@ -91,7 +91,7 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 | Response Time (p95) | < 500ms | 500-1000ms | > 1000ms |
 | Error Rate          | < 0.1%  | 0.1-1%     | > 1%     |
 | Function Duration   | < 2s    | 2-5s       | > 5s     |
-| MongoDB Connections | < 100   | 100-200    | > 200    |
+| Supabase Connections | < 100   | 100-200    | > 200    |
 | CDN Cache Hit Rate  | > 90%   | 80-90%     | < 80%    |
 
 ---
@@ -124,7 +124,7 @@ curl -I https://dobeu.net
 - Failed build/deploy
 - Environment variable misconfiguration
 - Function timeout
-- MongoDB connection failure
+- Supabase connection failure
 
 **Mitigation:**
 
@@ -195,11 +195,11 @@ netlify deploy --prod
 **Triage Steps:**
 
 ```bash
-# Check MongoDB Atlas status
-# Visit: https://status.mongodb.com/
+# Check Supabase Postgres (db-dobeutech-unified) status
+# Visit: https://status.supabase.com/
 
 # Test connection from local
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
+psql "$SUPABASE_URL" \
   --tls \
   --tlsCAFile <path-to-cert.pem> \
   --tlsCertificateKeyFile <path-to-cert.pem>
@@ -210,7 +210,7 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" \
 
 **Root Causes:**
 
-- MongoDB Atlas outage
+- Supabase Postgres (db-dobeutech-unified) outage
 - Connection pool exhaustion
 - X.509 certificate expired
 - Network/firewall issues
@@ -300,7 +300,7 @@ git push origin main
 # Check function duration in Netlify
 netlify logs:function --name=<function-name>
 
-# Check MongoDB slow queries
+# Check Supabase slow queries
 # Atlas Dashboard → Performance Advisor
 
 # Check function memory usage
@@ -324,7 +324,7 @@ netlify logs:function --name=<function-name>
 #   [functions."function-name"]
 #     timeout = 26
 
-# Optimize queries (add indexes in MongoDB)
+# Optimize queries (add indexes in Supabase)
 # Review slow queries in Atlas Performance Advisor
 
 # Add query timeouts
@@ -406,7 +406,7 @@ npx lighthouse https://dobeu.net --view
 npm run build
 ls -lh dist/assets/*.js
 
-# Check MongoDB query performance
+# Check Supabase query performance
 # Atlas Dashboard → Performance Advisor
 ```
 
@@ -467,11 +467,11 @@ export NETLIFY_AUTH_TOKEN="<token>"
 netlify deploy --prod --dir=dist
 ```
 
-### MongoDB Atlas
+### Supabase Postgres (db-dobeutech-unified)
 
 ```bash
 # Connect via mongosh
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
+psql "$SUPABASE_URL" \
   --tls \
   --tlsCAFile <cert.pem> \
   --tlsCertificateKeyFile <cert.pem>
@@ -578,7 +578,7 @@ git push origin main --force
 ### Database Rollback
 
 ```bash
-# MongoDB Atlas Point-in-Time Restore
+# Supabase Postgres (db-dobeutech-unified) Point-in-Time Restore
 # 1. Go to: Atlas Dashboard → Clusters → <cluster>
 # 2. Click "..." → "Restore"
 # 3. Select point in time
@@ -633,7 +633,7 @@ git push origin main --force
 **External Support**
 
 - Netlify Support: https://www.netlify.com/support/
-- MongoDB Atlas Support: https://support.mongodb.com/
+- Supabase Postgres (db-dobeutech-unified) Support: https://support.mongodb.com/
 - Auth0 Support: https://support.auth0.com/
 
 ---
@@ -698,7 +698,7 @@ After resolving an incident:
 
 - **Production Site:** https://dobeu.net
 - **Netlify Dashboard:** https://app.netlify.com/projects/dobeutech
-- **MongoDB Atlas:** https://cloud.mongodb.com/
+- **Supabase Postgres (db-dobeutech-unified):** https://supabase.com/dashboard/
 - **Auth0 Dashboard:** https://manage.auth0.com/
 - **PostHog:** https://us.posthog.com/
 - **GitHub Repo:** https://github.com/dobeutech/digital-wharf-dynamics

@@ -34,8 +34,8 @@ netlify logs:function --name=_auth0 | tail -20
 ### Database Down
 
 ```bash
-# Check MongoDB status: https://status.mongodb.com/
-netlify logs:function --name=projects | grep -i mongo
+# Check Supabase status: https://status.supabase.com/
+netlify logs:function --name=projects | grep -i supabase
 ```
 
 ---
@@ -44,7 +44,7 @@ netlify logs:function --name=projects | grep -i mongo
 
 1. **Netlify:** https://app.netlify.com/projects/dobeutech
 2. **PostHog:** https://us.posthog.com/
-3. **MongoDB:** https://cloud.mongodb.com/
+3. **Supabase:** https://supabase.com/dashboard/
 4. **Auth0:** https://manage.auth0.com/
 
 ---
@@ -234,13 +234,13 @@ netlify rollback
 ### Dashboards
 
 - Netlify: https://app.netlify.com/projects/dobeutech
-- MongoDB: https://cloud.mongodb.com/
+- Supabase: https://supabase.com/dashboard/
 - PostHog: https://us.posthog.com/
 
 ### Status Pages
 
 - Netlify: https://www.netlifystatus.com/
-- MongoDB: https://status.mongodb.com/
+- Supabase: https://status.supabase.com/
 - Auth0: https://status.auth0.com/
 
 ### Documentation
@@ -281,7 +281,7 @@ export NETLIFY_AUTH_TOKEN="<token>"
 # Token stored in: 1Password / Secrets Manager
 ```
 
-### MongoDB
+### Supabase
 
 ```bash
 # Certificate location: ~/.mongodb/cert.pem
@@ -316,7 +316,7 @@ netlify status
 netlify deploy:list | head -5
 
 # Test database
-mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_URL" --eval "db.runCommand({ping:1})"
 
 # Response time
 time curl -s https://dobeu.net > /dev/null
@@ -375,7 +375,7 @@ netlify deploy --prod --dir=dist
 | Service | Support                          |
 | ------- | -------------------------------- |
 | Netlify | https://www.netlify.com/support/ |
-| MongoDB | https://support.mongodb.com/     |
+| Supabase | https://support.mongodb.com/     |
 | Auth0   | https://support.auth0.com/       |
 
 ---

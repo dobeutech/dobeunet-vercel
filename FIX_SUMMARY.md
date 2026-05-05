@@ -35,7 +35,7 @@ The following items from the checklist remain open:
 
 - **Dashboard Pending Purchases:** Currently shows 0. Requires full backend implementation for purchase tracking.
 - **Dependency Vulnerabilities:** 6 moderate vulnerabilities in dev dependencies (esbuild/vite). Requires breaking changes to fix (skipped for now to prevent regression).
-- **Environment Variables:** Optional Supabase variables are not set (app works with MongoDB).
+- **Environment Variables:** Optional Supabase variables are not set (app works with Supabase).
 - **Documentation Index:** Minor documentation updates needed.
 
 ## 🧪 Verification
