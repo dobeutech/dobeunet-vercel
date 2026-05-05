@@ -155,7 +155,7 @@ netlify logs:deploy
 curl -I https://dobeu.net
 
 # API health
-curl https://dobeu.net/.netlify/functions/health
+curl https://dobeu.net/api/health
 
 # Database connection
 psql "$SUPABASE_DB_URL" -c "SELECT 1;"

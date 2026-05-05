@@ -342,16 +342,20 @@ aws logs create-log-stream \
 
 ### Create Health Check Endpoint
 
-**api/health.ts (Vercel function):**
+**api/health.ts (Vercel `@vercel/node` runtime):**
 
 ```typescript
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createClient } from "@supabase/supabase-js";
 
-export default async function handler(_req: Request) {
+export default async function handler(
+  _req: VercelRequest,
+  res: VercelResponse,
+) {
   const checks = {
     timestamp: new Date().toISOString(),
-    status: "healthy",
-    checks: {} as Record<string, any>,
+    status: "healthy" as "healthy" | "unhealthy",
+    checks: {} as Record<string, { status: string; message?: string }>,
   };
 
   // Check Supabase
@@ -389,17 +393,11 @@ export default async function handler(_req: Request) {
     };
   }
 
-  const statusCode = checks.status === "healthy" ? 200 : 503;
-
-  return {
-    statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-    },
-    body: JSON.stringify(checks, null, 2),
-  };
-};
+  res
+    .setHeader("Cache-Control", "no-cache")
+    .status(checks.status === "healthy" ? 200 : 503)
+    .json(checks);
+}
 ```
 
 ---

@@ -390,7 +390,7 @@ erDiagram
         string filename
         string content_type
         int size
-        string storage_path
+        string file_path
         datetime uploaded_at
     }
 ```

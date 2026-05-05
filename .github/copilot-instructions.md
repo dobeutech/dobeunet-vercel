@@ -214,51 +214,39 @@ function MyComponent() {
 ### Basic Function Template
 
 ```typescript
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export const handler: Handler = async (
-  event: HandlerEvent,
-  context: HandlerContext,
-) => {
-  // CORS headers
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  };
-
-  // Handle preflight
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, headers, body: "" };
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    res
+      .setHeader("Access-Control-Allow-Origin", "*")
+      .setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      .status(204)
+      .end();
+    return;
   }
 
   try {
     // Your logic here
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ success: true }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: "Internal error" }),
-    };
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Internal error" });
   }
-};
+}
 ```
 
 ### Authenticated Function
 
 ```typescript
-import { requireAuth, Auth0Claims } from "./_auth0";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { requireAuth, Auth0Claims } from "./_helpers/auth0";
 import { getSupabaseClient } from "./_helpers/supabase";
 
-export const handler: Handler = async (event) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Verify JWT and get user claims
-    const user: Auth0Claims = await requireAuth(event);
+    const user: Auth0Claims = await requireAuth(req);
 
     // Server-side Supabase client (service role)
     const supabase = getSupabaseClient();
@@ -283,7 +271,7 @@ export const handler: Handler = async (event) => {
     }
     return { statusCode: 500, body: JSON.stringify({ error: "Server error" }) };
   }
-};
+}
 ```
 
 ### Admin-Only Function

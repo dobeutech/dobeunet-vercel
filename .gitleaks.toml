@@ -13,10 +13,10 @@ paths = [
   '''\.gitleaks\.toml$''',
 ]
 regexes = [
+  # Only allowlist explicit publishable-prefix keys.  We deliberately do NOT
+  # allowlist arbitrary JWTs containing the project ref, so a leaked
+  # `service_role` JWT (which also contains the ref) is still detected.
   '''sb_publishable_[A-Za-z0-9_-]+''',
-  # Supabase anon/publishable JWT for project ref qdwvcrmdqweojverdmmz.
-  # Match without storing the literal JWT prefix to avoid recursive detection.
-  '''[A-Za-z0-9]+\.[A-Za-z0-9]*qdwvcrmdqweojverdmmz[A-Za-z0-9._-]*''',
 ]
 # Commit-level allowlist: the original PR commit briefly had publishable
 # Supabase keys in .env.example before they were replaced with placeholders.

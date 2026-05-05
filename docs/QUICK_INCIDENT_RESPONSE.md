@@ -80,8 +80,9 @@ netlify deploy --prod
 #    Get the connection string from Supabase Dashboard → Settings → Database
 psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
-# 3. Check function logs
-netlify logs:function --name=projects | grep -i "supabase\|connection\|timeout"
+# 3. Check function logs (Vercel)
+vercel logs --follow | grep -i "supabase\|connection\|timeout"
+# or via Vercel Dashboard → Project → Functions → Logs
 ```
 
 **Common Fixes:**
@@ -89,7 +90,7 @@ netlify logs:function --name=projects | grep -i "supabase\|connection\|timeout"
 ```bash
 # If connection pool exhausted:
 # - Restart functions (redeploy)
-netlify deploy --prod
+vercel deploy --prod
 
 # If certificate expired:
 # 1. Supabase manages TLS automatically — no manual cert download

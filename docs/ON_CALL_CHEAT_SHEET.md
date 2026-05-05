@@ -401,9 +401,9 @@ netlify deploy --prod --dir=dist
 
 ---
 
-**Print Date:** \***\*\_\_\_\*\***  
-**On-Call Period:** \***\*\_\_\_\*\***  
-**Backup Contact:** \***\*\_\_\_\*\***
+**Print Date:** ******\_\_******  
+**On-Call Period:** ******\_\_******  
+**Backup Contact:** ******\_\_******
 
 ---
 

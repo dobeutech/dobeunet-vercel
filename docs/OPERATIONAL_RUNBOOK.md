@@ -45,18 +45,18 @@
 ## Architecture
 
 ```
-User → Cloudflare/Netlify CDN → Static Assets (React SPA)
-                                ↓
-                         Netlify Functions → Supabase
-                                ↓
-                            Auth0 (JWT)
+User → Vercel Edge Network → Static Assets (React SPA)
+                              ↓
+                      Vercel Serverless Functions (api/*) → Supabase
+                              ↓
+                          Auth0 (JWT)
 ```
 
 ### Network Flow
 
-1. User requests → Netlify Edge (CDN)
-2. Static assets served from CDN
-3. API calls → Netlify Functions
+1. User requests → Vercel Edge (CDN, automatic global distribution)
+2. Static assets served from Vercel's edge cache
+3. API calls → Vercel Serverless Functions (`api/*.ts`, `@vercel/node` runtime)
 4. Functions → Supabase Postgres `db-dobeutech-unified` (TLS, service-role key on the server, anon/publishable key in the browser; RLS enforces row-level access)
 5. Auth → Auth0 (OAuth2/OIDC)
 
@@ -86,13 +86,13 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 
 ### Key Metrics to Monitor
 
-| Metric              | Normal  | Warning    | Critical |
-| ------------------- | ------- | ---------- | -------- |
-| Response Time (p95) | < 500ms | 500-1000ms | > 1000ms |
-| Error Rate          | < 0.1%  | 0.1-1%     | > 1%     |
-| Function Duration   | < 2s    | 2-5s       | > 5s     |
+| Metric               | Normal  | Warning    | Critical |
+| -------------------- | ------- | ---------- | -------- |
+| Response Time (p95)  | < 500ms | 500-1000ms | > 1000ms |
+| Error Rate           | < 0.1%  | 0.1-1%     | > 1%     |
+| Function Duration    | < 2s    | 2-5s       | > 5s     |
 | Supabase Connections | < 100   | 100-200    | > 200    |
-| CDN Cache Hit Rate  | > 90%   | 80-90%     | < 80%    |
+| CDN Cache Hit Rate   | > 90%   | 80-90%     | < 80%    |
 
 ---
 
@@ -198,11 +198,9 @@ netlify deploy --prod
 # Check Supabase Postgres (db-dobeutech-unified) status
 # Visit: https://status.supabase.com/
 
-# Test connection from local
-psql "$SUPABASE_URL" \
-  --tls \
-  --tlsCAFile <path-to-cert.pem> \
-  --tlsCertificateKeyFile <path-to-cert.pem>
+# Test connection from local (use the Postgres DSN, NOT the HTTPS API URL)
+# Get SUPABASE_DB_URL from Supabase Dashboard → Settings → Database → Connection string
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # Check connection pool metrics in Supabase Dashboard
 # Navigate to: Metrics → Connections
