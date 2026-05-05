@@ -10,10 +10,11 @@ description = "Public-by-design Supabase keys and example env templates"
 paths = [
   '''\.env\.example$''',
   '''\.env\.example\.[a-z]+$''',
+  '''\.gitleaks\.toml$''',
 ]
 regexes = [
-  # Supabase publishable keys (sb_publishable_...)
   '''sb_publishable_[A-Za-z0-9_-]+''',
-  # Supabase anon JWT tied to project ref qdwvcrmdqweojverdmmz (publishable by design)
-  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd3Zjcm1kcXdlb2p2ZXJkbW16[A-Za-z0-9._-]+''',
+  # Supabase anon/publishable JWT for project ref qdwvcrmdqweojverdmmz.
+  # Match without storing the literal JWT prefix to avoid recursive detection.
+  '''[A-Za-z0-9]+\.[A-Za-z0-9]*qdwvcrmdqweojverdmmz[A-Za-z0-9._-]*''',
 ]
