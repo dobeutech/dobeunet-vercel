@@ -8,20 +8,20 @@ Comprehensive AI agent guidelines for working on the DOBEU Tech Solutions codeba
 
 **DOBEU** is a premium digital services platform offering web development, software solutions, and consulting.
 
-| Category         | Technologies                         |
-| ---------------- | ------------------------------------ |
-| **Frontend**     | React 18, TypeScript 5, Vite 7       |
-| **UI**           | Tailwind CSS, Radix UI, shadcn/ui    |
-| **Animation**    | Framer Motion (`motion/react`)       |
-| **Backend**      | Netlify Functions (Node.js)          |
-| **Auth**         | Auth0 (SPA + JWT)                    |
-| **Database**     | MongoDB Atlas, Supabase (PostgreSQL) |
-| **File Storage** | MongoDB GridFS                       |
-| **Payments**     | Stripe                               |
-| **SMS**          | Twilio                               |
-| **Analytics**    | PostHog, Mixpanel, Google Analytics  |
-| **Hosting**      | Netlify (Edge, CDN, Functions)       |
-| **Testing**      | Vitest (unit), Playwright (E2E)      |
+| Category         | Technologies                                   |
+| ---------------- | ---------------------------------------------- |
+| **Frontend**     | React 18, TypeScript 5, Vite 7                 |
+| **UI**           | Tailwind CSS, Radix UI, shadcn/ui              |
+| **Animation**    | Framer Motion (`motion/react`)                 |
+| **Backend**      | Vercel Serverless Functions (Node)             |
+| **Auth**         | Auth0 (SPA + JWT) + Supabase Auth              |
+| **Database**     | Supabase (PostgreSQL) — `db-dobeutech-unified` |
+| **File Storage** | Supabase Storage                               |
+| **Payments**     | Stripe                                         |
+| **SMS**          | Twilio                                         |
+| **Analytics**    | PostHog, Mixpanel, Google Analytics            |
+| **Hosting**      | Vercel (Edge, CDN, Functions)                  |
+| **Testing**      | Vitest (unit), Playwright (E2E)                |
 
 ---
 
@@ -58,11 +58,11 @@ src/
 │   └── admin/            # Admin portal pages
 └── __tests__/            # Test files
 
-netlify/functions/        # Serverless API endpoints
-├── _auth0.ts             # Auth0 JWT verification
-├── _mongo.ts             # MongoDB connection
-├── _gridfs.ts            # GridFS file storage
-├── _http.ts              # HTTP utilities
+api/                      # Vercel serverless API endpoints
+├── _helpers/             # Shared helpers
+│   ├── auth0.ts          # Auth0 JWT verification
+│   ├── supabase.ts       # Supabase server client (getSupabaseClient)
+│   └── http.ts           # HTTP utilities
 └── *.ts                  # API endpoints
 
 supabase/
@@ -209,65 +209,54 @@ function MyComponent() {
 
 ---
 
-## Backend Patterns (Netlify Functions)
+## Backend Patterns (Vercel Functions)
 
 ### Basic Function Template
 
 ```typescript
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-export const handler: Handler = async (
-  event: HandlerEvent,
-  context: HandlerContext,
-) => {
-  // CORS headers
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    "Content-Type": "application/json",
-  };
-
-  // Handle preflight
-  if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, headers, body: "" };
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    res
+      .setHeader("Access-Control-Allow-Origin", "*")
+      .setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+      .status(204)
+      .end();
+    return;
   }
 
   try {
     // Your logic here
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ success: true }),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: "Internal error" }),
-    };
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Internal error" });
   }
-};
+}
 ```
 
 ### Authenticated Function
 
 ```typescript
-import { requireAuth, Auth0Claims } from "./_auth0";
-import { getMongoDb } from "./_mongo";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { requireAuth, Auth0Claims } from "./_helpers/auth0";
+import { getSupabaseClient } from "./_helpers/supabase";
 
-export const handler: Handler = async (event) => {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     // Verify JWT and get user claims
-    const user: Auth0Claims = await requireAuth(event);
+    const user: Auth0Claims = await requireAuth(req);
 
-    // Get database
-    const db = await getMongoDb();
+    // Server-side Supabase client (service role)
+    const supabase = getSupabaseClient();
 
     // Query with user context
-    const data = await db
-      .collection("items")
-      .find({ user_id: user.sub })
-      .toArray();
+    const { data, error } = await supabase
+      .from("items")
+      .select("*")
+      .eq("user_id", user.sub);
+    if (error) throw error;
 
     return {
       statusCode: 200,
@@ -282,7 +271,7 @@ export const handler: Handler = async (event) => {
     }
     return { statusCode: 500, body: JSON.stringify({ error: "Server error" }) };
   }
-};
+}
 ```
 
 ### Admin-Only Function
@@ -302,43 +291,33 @@ export const handler: Handler = async (event) => {
 
 ## Database
 
-### MongoDB Collections
+All data lives in Supabase Postgres project **`db-dobeutech-unified`**
+(`https://qdwvcrmdqweojverdmmz.supabase.co`). There is no MongoDB.
 
-| Collection               | Purpose                      |
-| ------------------------ | ---------------------------- |
-| `profiles`               | User profiles (Auth0 linked) |
-| `sms_verification_codes` | SMS verification codes       |
-| `contact_submissions`    | Contact form submissions     |
-| `audit_logs`             | Activity audit trail         |
-| `newsletter_posts`       | Newsletter content           |
-
-### MongoDB Operations
+### Supabase Operations
 
 ```typescript
-import { getMongoDb } from "./_mongo";
-import { ObjectId } from "mongodb";
+import { getSupabaseClient } from "./_helpers/supabase";
 
-const db = await getMongoDb();
-const collection = db.collection("collection_name");
+const supabase = getSupabaseClient();
 
-// Find
-const doc = await collection.findOne({ _id: new ObjectId(id) });
-const docs = await collection.find({ status: "active" }).toArray();
+// Select
+const { data, error } = await supabase
+  .from("table_name")
+  .select("*")
+  .eq("user_id", userId);
 
 // Insert
-await collection.insertOne({
-  ...data,
-  created_at: new Date().toISOString(),
-});
+await supabase.from("table_name").insert({ ...data });
 
 // Update
-await collection.updateOne(
-  { _id: new ObjectId(id) },
-  { $set: { ...updates, updated_at: new Date().toISOString() } },
-);
+await supabase
+  .from("table_name")
+  .update({ ...updates })
+  .eq("id", id);
 
 // Delete
-await collection.deleteOne({ _id: new ObjectId(id) });
+await supabase.from("table_name").delete().eq("id", id);
 ```
 
 ### Supabase Tables
@@ -500,17 +479,17 @@ VITE_POSTHOG_KEY=your-posthog-key
 VITE_POSTHOG_HOST=https://app.posthog.com
 ```
 
-### Backend (Netlify Functions)
+### Backend (Vercel Functions)
 
 ```env
 # Auth0
 AUTH0_DOMAIN=your-tenant.us.auth0.com
-AUTH0_AUDIENCE=https://api.dobeu.netlify.app
+AUTH0_AUDIENCE=https://api.dobeu.net
 
-# MongoDB
-MONGODB_URI=mongodb+srv://...
-MONGODB_DB_NAME=app
-GRIDFS_BUCKET=files
+# Supabase (db-dobeutech-unified)
+SUPABASE_URL=https://qdwvcrmdqweojverdmmz.supabase.co
+SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
 
 # Twilio
 TWILIO_ACCOUNT_SID=...

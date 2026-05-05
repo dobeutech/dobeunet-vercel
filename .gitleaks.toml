@@ -1,0 +1,31 @@
+# Extends the default gitleaks ruleset.
+# Supabase publishable/anon keys are designed to be embedded in client code;
+# they are not secrets. Keep the scanner from flagging .env.example placeholders
+# and any past commits that briefly held them.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public-by-design Supabase keys and example env templates"
+paths = [
+  '''\.env\.example$''',
+  '''\.env\.example\.[a-z]+$''',
+  '''\.gitleaks\.toml$''',
+]
+regexes = [
+  # Only allowlist explicit publishable-prefix keys.  We deliberately do NOT
+  # allowlist arbitrary JWTs containing the project ref, so a leaked
+  # `service_role` JWT (which also contains the ref) is still detected.
+  '''sb_publishable_[A-Za-z0-9_-]+''',
+]
+# Commit-level allowlist: the original PR commit briefly had publishable
+# Supabase keys in .env.example before they were replaced with placeholders.
+# Publishable/anon keys are designed to be embedded client-side and were
+# rotated/scoped by RLS, so this commit is safe to allowlist.
+commits = [
+  # Original PR commit briefly had Supabase publishable/anon keys in .env.example.
+  "67e8e95fd27578b05f2c22ff96f257dbd6f7b7a2",
+  # Initial .gitleaks.toml briefly contained a literal JWT prefix as a regex
+  # before being rewritten to avoid the literal in 1e94577.
+  "1b935468aa6beecc3af24f20c0a7802439cbdc8a",
+]

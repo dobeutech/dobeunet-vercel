@@ -14,7 +14,7 @@ graph TB
     end
 
     subgraph "CDN & Edge"
-        Netlify[Netlify CDN]
+        VercelEdge[Vercel Edge Network]
         EdgeFn[Edge Functions]
         CSP[CSP Nonce]
         UABlock[UA Blocker]
@@ -29,8 +29,8 @@ graph TB
     end
 
     subgraph "Serverless Functions"
-        AuthFn[_auth0.ts]
-        SupabaseFn[_supabase.ts]
+        AuthFn[_helpers/auth0.ts]
+        SupabaseFn[_helpers/supabase.ts]
         ContactFn[contact-submissions.ts]
         ProjectsFn[projects.ts]
         ServicesFn[services.ts]
@@ -63,13 +63,13 @@ graph TB
         Typeform[Typeform]
     end
 
-    Browser --> Netlify
-    Mobile --> Netlify
-    Netlify --> EdgeFn
+    Browser --> VercelEdge
+    Mobile --> VercelEdge
+    VercelEdge --> EdgeFn
     EdgeFn --> CSP
     EdgeFn --> UABlock
     EdgeFn --> Prerender
-    Netlify --> React
+    VercelEdge --> React
     React --> Router
     React --> RQ
     React --> Auth0Client
@@ -107,11 +107,11 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant User
-    participant CDN as Netlify CDN
+    participant CDN as Vercel Edge
     participant Edge as Edge Functions
     participant App as React App
     participant Auth as Auth0
-    participant Fn as Netlify Functions
+    participant Fn as Vercel Functions
     participant DB as Supabase
     participant Ext as External APIs
 
@@ -158,7 +158,7 @@ graph LR
     end
 
     subgraph "Backend"
-        Functions[Netlify Functions]
+        Functions[Vercel Functions]
         Validation[Input Validation]
         Business[Business Logic]
     end
@@ -195,7 +195,7 @@ sequenceDiagram
     participant App as React App
     participant Auth0SDK as Auth0 SDK
     participant Auth0 as Auth0 Service
-    participant Fn as Netlify Function
+    participant Fn as Vercel Function
     participant DB as Supabase
 
     User->>App: Click Login
@@ -390,7 +390,7 @@ erDiagram
         string filename
         string content_type
         int size
-        string gridfs_id
+        string file_path
         datetime uploaded_at
     }
 ```
@@ -424,7 +424,7 @@ graph LR
     subgraph "Monitoring"
         Netlify[Netlify Logs]
         PostHog[PostHog Events]
-        Atlas[MongoDB Metrics]
+        SBMetrics[Supabase Logs & Metrics]
     end
 
     Dev --> Git
@@ -438,7 +438,7 @@ graph LR
     PR --> Prod
     Prod --> Netlify
     Prod --> PostHog
-    Prod --> Atlas
+    Prod --> Supa
     Prod --> Rollback
 ```
 
@@ -474,7 +474,7 @@ graph TB
     end
 
     subgraph "Database"
-        Mongo[MongoDB Atlas]
+        Supa[Supabase Postgres db-dobeutech-unified]
     end
 
     App --> AuthSDK
@@ -486,7 +486,7 @@ graph TB
     App --> IC
     App --> TF
     App --> Stripe
-    App --> Mongo
+    App --> Supa
 ```
 
 ---
@@ -556,8 +556,8 @@ graph TB
     end
 
     subgraph "Database"
-        Atlas[MongoDB Atlas]
-        GridFS[GridFS]
+        Supa[Supabase Postgres db-dobeutech-unified]
+        SupaStor[Supabase Storage]
         Indexes[Indexes]
     end
 
@@ -571,9 +571,9 @@ graph TB
     Netlify --> Functions
     Functions --> Node
     Functions --> TS
-    Functions --> Atlas
-    Atlas --> GridFS
-    Atlas --> Indexes
+    Functions --> Supa
+    Supa --> SupaStor
+    Supa --> Indexes
     Functions --> Auth0
     Auth0 --> JWT
 ```
@@ -649,7 +649,7 @@ graph TB
     end
 
     subgraph "Database Monitoring"
-        Atlas[MongoDB Atlas]
+        Supa[Supabase Postgres db-dobeutech-unified]
         Perf[Performance Advisor]
         Slow[Slow Query Logs]
     end
@@ -672,7 +672,7 @@ graph TB
     Boundary --> Toast
     Netlify --> Functions
     Functions --> CDN
-    Atlas --> Perf
+    Supa --> Perf
     Perf --> Slow
     Slow --> Email
     Email --> Slack
@@ -698,14 +698,14 @@ graph TB
     end
 
     subgraph "Origin"
-        Functions[Netlify Functions]
+        Functions[Vercel Functions]
         Static[Static Assets]
     end
 
     subgraph "Database"
-        Primary[MongoDB Primary]
-        Secondary1[MongoDB Secondary 1]
-        Secondary2[MongoDB Secondary 2]
+        Primary[Supabase Primary]
+        Replica1[Supabase Read Replica 1]
+        Replica2[Supabase Read Replica 2]
     end
 
     Domain --> Netlify
@@ -718,8 +718,8 @@ graph TB
     Edge2 --> Functions
     Edge2 --> Static
     Functions --> Primary
-    Primary --> Secondary1
-    Primary --> Secondary2
+    Primary --> Replica1
+    Primary --> Replica2
 ```
 
 ---
@@ -731,14 +731,14 @@ graph TB
     subgraph "Horizontal Scaling"
         CDN[CDN Edge Nodes]
         Functions[Serverless Functions]
-        DB[MongoDB Sharding]
+        DB[Supabase Read Replicas + Connection Pooling]
     end
 
     subgraph "Caching"
         Browser[Browser Cache]
         CDNCache[CDN Cache]
         QueryCache[React Query Cache]
-        DBCache[MongoDB Cache]
+        PGBouncer[Supabase pgbouncer pool]
     end
 
     subgraph "Optimization"
@@ -803,7 +803,7 @@ sequenceDiagram
     participant RHF as React Hook Form
     participant Zod as Zod Validator
     participant API as API Client
-    participant Fn as Netlify Function
+    participant Fn as Vercel Function
     participant DB as Supabase
 
     User->>Form: Fill Form

@@ -21,30 +21,30 @@
 
 ```bash
 curl -I https://dobeu.net
-netlify rollback
+vercel rollback
 ```
 
 ### Auth Broken
 
 ```bash
 curl https://status.auth0.com/api/v2/status.json
-netlify logs:function --name=_auth0 | tail -20
+vercel logs --since 15m
 ```
 
 ### Database Down
 
 ```bash
-# Check MongoDB status: https://status.mongodb.com/
-netlify logs:function --name=projects | grep -i mongo
+# Check Supabase status: https://status.supabase.com/
+vercel logs --follow | grep -i supabase
 ```
 
 ---
 
 ## 📊 DASHBOARDS (Check in Order)
 
-1. **Netlify:** https://app.netlify.com/projects/dobeutech
+1. **Vercel:** https://vercel.com/dobeutechnology/dobeunet-vercel
 2. **PostHog:** https://us.posthog.com/
-3. **MongoDB:** https://cloud.mongodb.com/
+3. **Supabase:** https://supabase.com/dashboard/
 4. **Auth0:** https://manage.auth0.com/
 
 ---
@@ -56,7 +56,7 @@ netlify logs:function --name=projects | grep -i mongo
 ```bash
 # All-in-one health check
 curl -I https://dobeu.net && \
-netlify status && \
+vercel inspect && \
 echo "✅ Basic health OK"
 ```
 
@@ -64,23 +64,23 @@ echo "✅ Basic health OK"
 
 ```bash
 # Function logs (last 50 lines)
-netlify logs:function --name=<function-name> | tail -50
+vercel logs --since 30m
 
 # Deploy logs
-netlify logs:deploy
+vercel logs
 
 # Filter for errors
-netlify logs:function --name=<function> | grep -i error
+vercel logs --follow | grep -i error
 ```
 
 ### Check Recent Deploys
 
 ```bash
 # List last 5 deploys
-netlify deploy:list | head -5
+vercel ls | head -5
 
 # Check current status
-netlify status
+vercel inspect
 ```
 
 ---
@@ -90,12 +90,12 @@ netlify status
 ### Method 1: CLI (Fastest)
 
 ```bash
-netlify rollback
+vercel rollback
 ```
 
 ### Method 2: Dashboard
 
-1. Go to: https://app.netlify.com/projects/dobeutech/deploys
+1. Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 2. Find last successful deploy
 3. Click "Publish deploy"
 
@@ -175,7 +175,7 @@ Follow-up: [Ticket link]
 ### Site Down
 
 ```bash
-netlify rollback
+vercel rollback
 ```
 
 ### Auth Errors
@@ -183,21 +183,21 @@ netlify rollback
 ```bash
 # Check Auth0 status first
 # If Auth0 is up, check env vars:
-netlify env:list | grep AUTH0
+vercel env ls | grep AUTH0
 ```
 
 ### Database Errors
 
 ```bash
 # Restart functions (redeploy)
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ### Build Failures
 
 ```bash
 # Check build logs
-netlify logs:deploy
+vercel logs
 
 # Reproduce locally
 npm run build
@@ -208,7 +208,7 @@ npm run build
 ```bash
 # Check PostHog: https://us.posthog.com/
 # If recent deploy, rollback:
-netlify rollback
+vercel rollback
 ```
 
 ---
@@ -233,14 +233,14 @@ netlify rollback
 
 ### Dashboards
 
-- Netlify: https://app.netlify.com/projects/dobeutech
-- MongoDB: https://cloud.mongodb.com/
+- Netlify: https://vercel.com/dobeutechnology/dobeunet-vercel
+- Supabase: https://supabase.com/dashboard/
 - PostHog: https://us.posthog.com/
 
 ### Status Pages
 
-- Netlify: https://www.netlifystatus.com/
-- MongoDB: https://status.mongodb.com/
+- Netlify: https://www.vercel-status.com/
+- Supabase: https://status.supabase.com/
 - Auth0: https://status.auth0.com/
 
 ### Documentation
@@ -277,15 +277,16 @@ Is site accessible?
 ### Netlify
 
 ```bash
-export NETLIFY_AUTH_TOKEN="<token>"
+export VERCEL_TOKEN="<token>"
 # Token stored in: 1Password / Secrets Manager
 ```
 
-### MongoDB
+### Supabase
 
 ```bash
-# Certificate location: ~/.mongodb/cert.pem
-# Connection string in: Netlify env vars
+# Connection string lives in Vercel Project Settings → Environment Variables
+# (SUPABASE_DB_URL).  No client certs needed; TLS is automatic.
+# Test it: psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 ```
 
 ### Auth0
@@ -304,19 +305,19 @@ export NETLIFY_AUTH_TOKEN="<token>"
 curl -I https://dobeu.net
 
 # Rollback
-netlify rollback
+vercel rollback
 
 # Check errors
-netlify logs:function --name=projects | grep ERROR
+vercel logs --follow | grep ERROR
 
 # Deploy status
-netlify status
+vercel inspect
 
 # Recent deploys
-netlify deploy:list | head -5
+vercel ls | head -5
 
 # Test database
-mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # Response time
 time curl -s https://dobeu.net > /dev/null
@@ -365,18 +366,18 @@ npx tsc --noEmit
 npm run build
 
 # Deploy
-netlify deploy --prod --dir=dist
+vercel deploy --prod --dir=dist
 ```
 
 ---
 
 ## 📞 EXTERNAL SUPPORT
 
-| Service | Support                          |
-| ------- | -------------------------------- |
-| Netlify | https://www.netlify.com/support/ |
-| MongoDB | https://support.mongodb.com/     |
-| Auth0   | https://support.auth0.com/       |
+| Service  | Support                      |
+| -------- | ---------------------------- |
+| Vercel   | https://vercel.com/help      |
+| Supabase | https://supabase.com/support |
+| Auth0    | https://support.auth0.com/   |
 
 ---
 
@@ -400,9 +401,9 @@ netlify deploy --prod --dir=dist
 
 ---
 
-**Print Date:** ****\_\_\_****  
-**On-Call Period:** ****\_\_\_****  
-**Backup Contact:** ****\_\_\_****
+**Print Date:** **\*\***\_\_**\*\***  
+**On-Call Period:** **\*\***\_\_**\*\***  
+**Backup Contact:** **\*\***\_\_**\*\***
 
 ---
 

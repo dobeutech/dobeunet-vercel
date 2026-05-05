@@ -112,8 +112,8 @@ npx tsc --noEmit
 node scripts/deploy-checklist.js
 
 # Deploy
-export NETLIFY_AUTH_TOKEN="<token>"
-netlify deploy --prod --dir=dist
+export VERCEL_TOKEN="<token>"
+vercel deploy --prod --dir=dist
 
 # Verify
 curl -I https://dobeu.net
@@ -125,10 +125,10 @@ curl -I https://dobeu.net
 
 ```bash
 # Quick rollback
-netlify rollback
+vercel rollback
 
 # Or via dashboard
-# https://app.netlify.com/projects/dobeutech/deploys
+# https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 ```
 
 **Reference:** [Runbook → Rollback Procedures](./OPERATIONAL_RUNBOOK.md#rollback-procedures)
@@ -137,13 +137,13 @@ netlify rollback
 
 ```bash
 # Function logs
-netlify logs:function --name=<function-name>
+vercel logs --follow
 
 # Deploy logs
-netlify logs:deploy
+vercel logs
 
-# MongoDB logs
-# Atlas Dashboard → Metrics → Logs
+# Supabase logs
+# Supabase Dashboard → Logs Explorer (Postgres / API / Auth / Storage)
 ```
 
 **Reference:** [Runbook → Diagnostic Commands](./OPERATIONAL_RUNBOOK.md#diagnostic-commands)
@@ -155,10 +155,10 @@ netlify logs:deploy
 curl -I https://dobeu.net
 
 # API health
-curl https://dobeu.net/.netlify/functions/health
+curl https://dobeu.net/api/health
 
 # Database connection
-mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 ```
 
 **Reference:** [Runbook → Diagnostic Commands](./OPERATIONAL_RUNBOOK.md#diagnostic-commands)
@@ -190,21 +190,21 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 
 ### Dashboards
 
-- **Netlify:** https://app.netlify.com/projects/dobeutech
-- **MongoDB Atlas:** https://cloud.mongodb.com/
+- **Vercel:** https://vercel.com/dobeutechnology/dobeunet-vercel
+- **Supabase (db-dobeutech-unified):** https://supabase.com/dashboard/project/qdwvcrmdqweojverdmmz
 - **PostHog:** https://us.posthog.com/
 - **Auth0:** https://manage.auth0.com/
 
 ### Status Pages
 
-- **Netlify Status:** https://www.netlifystatus.com/
-- **MongoDB Status:** https://status.mongodb.com/
+- **Vercel Status:** https://www.vercel-status.com/
+- **Supabase Status:** https://status.supabase.com/
 - **Auth0 Status:** https://status.auth0.com/
 
 ### Documentation
 
-- **Netlify Docs:** https://docs.netlify.com/
-- **MongoDB Docs:** https://docs.mongodb.com/
+- **Vercel Docs:** https://vercel.com/docs/
+- **Supabase Docs:** https://supabase.com/docs
 - **Auth0 Docs:** https://auth0.com/docs/
 
 ---
@@ -223,7 +223,7 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 ### Weekly Review
 
 - [ ] Review error rates in PostHog
-- [ ] Check MongoDB performance metrics
+- [ ] Check Supabase performance metrics
 - [ ] Review slow queries
 - [ ] Check disk space
 - [ ] Review function performance
@@ -274,7 +274,7 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 
 **Scenario 2: Database Connection Failure**
 
-- Trigger: MongoDB connection errors
+- Trigger: Supabase connection errors
 - Practice: Diagnostic steps, certificate renewal
 - Time limit: 15 minutes
 
@@ -326,7 +326,7 @@ When updating documentation:
 **By Component:**
 
 - Netlify → [Runbook → Architecture](./OPERATIONAL_RUNBOOK.md#architecture)
-- MongoDB → [Runbook → Database Failures](./OPERATIONAL_RUNBOOK.md#3-database-connection-failures)
+- Supabase → [Runbook → Database Failures](./OPERATIONAL_RUNBOOK.md#3-database-connection-failures)
 - Auth0 → [Runbook → Authentication Failures](./OPERATIONAL_RUNBOOK.md#2-authentication-failures)
 
 **By Task:**
@@ -351,7 +351,7 @@ When updating documentation:
 ### Tracking
 
 - **Daily:** Check in PostHog dashboard
-- **Weekly:** Review trends in Netlify
+- **Weekly:** Review trends in Vercel
 - **Monthly:** Generate SLO report
 
 **Reference:** [Monitoring → Metrics](./MONITORING_SETUP.md#overview)

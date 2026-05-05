@@ -36,8 +36,8 @@
 
 ### Critical Dependencies
 
-- **Netlify Functions:** 17 serverless functions
-- **Edge Functions:** 4 edge functions (CSP, prerender, UA blocker)
+- **Vercel Functions:** 16 serverless functions (`api/*.ts`)
+- **Edge Middleware:** Static CSP/security headers configured in `vercel.json` (no custom edge functions in this repo)
 - **External APIs:** Auth0, Supabase, Stripe, Intercom, PostHog
 
 ---
@@ -45,19 +45,19 @@
 ## Architecture
 
 ```
-User → Cloudflare/Netlify CDN → Static Assets (React SPA)
-                                ↓
-                         Netlify Functions → Supabase
-                                ↓
-                            Auth0 (JWT)
+User → Vercel Edge Network → Static Assets (React SPA)
+                              ↓
+                      Vercel Serverless Functions (api/*) → Supabase
+                              ↓
+                          Auth0 (JWT)
 ```
 
 ### Network Flow
 
-1. User requests → Netlify Edge (CDN)
-2. Static assets served from CDN
-3. API calls → Netlify Functions
-4. Functions → MongoDB Atlas (X.509 auth)
+1. User requests → Vercel Edge (CDN, automatic global distribution)
+2. Static assets served from Vercel's edge cache
+3. API calls → Vercel Serverless Functions (`api/*.ts`, `@vercel/node` runtime)
+4. Functions → Supabase Postgres `db-dobeutech-unified` (TLS, service-role key on the server, anon/publishable key in the browser; RLS enforces row-level access)
 5. Auth → Auth0 (OAuth2/OIDC)
 
 ---
@@ -66,17 +66,17 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 
 ### Primary Dashboards
 
-**Netlify Dashboard**
+**Vercel Dashboard**
 
-- URL: https://app.netlify.com/projects/dobeutech
+- URL: https://vercel.com/dobeutechnology/dobeunet-vercel
 - Metrics: Deploy status, function invocations, bandwidth
 - Access: Team login required
 
-**MongoDB Atlas Dashboard**
+**Supabase Postgres (db-dobeutech-unified) Dashboard**
 
-- URL: https://cloud.mongodb.com/
+- URL: https://supabase.com/dashboard/
 - Metrics: Connection count, query performance, storage
-- Access: X.509 certificate required
+- Access: project member login (no client certs needed)
 
 **PostHog Dashboard**
 
@@ -86,13 +86,13 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 
 ### Key Metrics to Monitor
 
-| Metric              | Normal  | Warning    | Critical |
-| ------------------- | ------- | ---------- | -------- |
-| Response Time (p95) | < 500ms | 500-1000ms | > 1000ms |
-| Error Rate          | < 0.1%  | 0.1-1%     | > 1%     |
-| Function Duration   | < 2s    | 2-5s       | > 5s     |
-| MongoDB Connections | < 100   | 100-200    | > 200    |
-| CDN Cache Hit Rate  | > 90%   | 80-90%     | < 80%    |
+| Metric               | Normal  | Warning    | Critical |
+| -------------------- | ------- | ---------- | -------- |
+| Response Time (p95)  | < 500ms | 500-1000ms | > 1000ms |
+| Error Rate           | < 0.1%  | 0.1-1%     | > 1%     |
+| Function Duration    | < 2s    | 2-5s       | > 5s     |
+| Supabase Connections | < 100   | 100-200    | > 200    |
+| CDN Cache Hit Rate   | > 90%   | 80-90%     | < 80%    |
 
 ---
 
@@ -103,17 +103,17 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 **Symptoms:**
 
 - Users report "Site unavailable"
-- Netlify shows failed deploy
+- Vercel shows failed deploy
 - 500 errors in browser console
 
 **Triage Steps:**
 
 ```bash
-# Check Netlify deploy status
-netlify status
+# Check Vercel deploy status
+vercel inspect
 
 # Check latest deploy logs
-netlify logs:function --name=<function-name>
+vercel logs --follow
 
 # Check if site is accessible
 curl -I https://dobeu.net
@@ -124,17 +124,17 @@ curl -I https://dobeu.net
 - Failed build/deploy
 - Environment variable misconfiguration
 - Function timeout
-- MongoDB connection failure
+- Supabase connection failure
 
 **Mitigation:**
 
 ```bash
 # Rollback to last known good deploy
-netlify rollback
+vercel rollback
 
 # Or redeploy from main
 git checkout main
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -153,11 +153,11 @@ netlify deploy --prod
 # Check Auth0 status
 curl https://status.auth0.com/api/v2/status.json
 
-# Verify Auth0 env vars in Netlify
-netlify env:list | grep AUTH0
+# Verify Auth0 env vars in Vercel
+vercel env ls | grep AUTH0
 
 # Check function logs
-netlify logs:function --name=_auth0
+vercel logs --follow
 ```
 
 **Root Causes:**
@@ -174,12 +174,12 @@ netlify logs:function --name=_auth0
 # Check: https://manage.auth0.com/dashboard
 
 # Update Auth0 env vars if needed
-netlify env:set AUTH0_DOMAIN <value>
-netlify env:set AUTH0_CLIENT_ID <value>
-netlify env:set AUTH0_CLIENT_SECRET <value>
+vercel env add AUTH0_DOMAIN <value>
+vercel env add AUTH0_CLIENT_ID <value>
+vercel env add AUTH0_CLIENT_SECRET <value>
 
 # Redeploy
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -195,40 +195,38 @@ netlify deploy --prod
 **Triage Steps:**
 
 ```bash
-# Check MongoDB Atlas status
-# Visit: https://status.mongodb.com/
+# Check Supabase Postgres (db-dobeutech-unified) status
+# Visit: https://status.supabase.com/
 
-# Test connection from local
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
-  --tls \
-  --tlsCAFile <path-to-cert.pem> \
-  --tlsCertificateKeyFile <path-to-cert.pem>
+# Test connection from local (use the Postgres DSN, NOT the HTTPS API URL)
+# Get SUPABASE_DB_URL from Supabase Dashboard → Settings → Database → Connection string
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
-# Check connection pool metrics in Atlas dashboard
+# Check connection pool metrics in Supabase Dashboard
 # Navigate to: Metrics → Connections
 ```
 
 **Root Causes:**
 
-- MongoDB Atlas outage
+- Supabase Postgres (db-dobeutech-unified) outage
 - Connection pool exhaustion
-- X.509 certificate expired
+- TLS handshake / network egress issue
 - Network/firewall issues
 - IP whitelist misconfiguration
 
 **Mitigation:**
 
 ```bash
-# Check IP whitelist in Atlas
+# Check IP allowlist in Supabase Dashboard → Settings → Database
 # Navigate to: Network Access → IP Access List
 
 # Verify certificate validity
 openssl x509 -in <cert.pem> -noout -dates
 
 # Restart functions (redeploy)
-netlify deploy --prod
+vercel deploy --prod
 
-# If certificate expired, regenerate in Atlas:
+# If TLS cert pinned by Supabase, no manual rotation needed:
 # Database Access → Users → Download new certificate
 ```
 
@@ -238,16 +236,16 @@ netlify deploy --prod
 
 **Symptoms:**
 
-- Deploy fails in Netlify
+- Deploy fails in Vercel
 - "Build failed" notification
 - TypeScript/ESLint errors
 
 **Triage Steps:**
 
 ```bash
-# Check build logs in Netlify dashboard
+# Check build logs in Vercel dashboard
 # Or via CLI:
-netlify logs:deploy
+vercel logs
 
 # Reproduce locally
 npm run build
@@ -297,14 +295,14 @@ git push origin main
 **Triage Steps:**
 
 ```bash
-# Check function duration in Netlify
-netlify logs:function --name=<function-name>
+# Check function duration in Vercel
+vercel logs --follow
 
-# Check MongoDB slow queries
-# Atlas Dashboard → Performance Advisor
+# Check Supabase slow queries
+# Supabase Dashboard → Performance Advisor
 
 # Check function memory usage
-# Netlify Dashboard → Functions → <function> → Metrics
+# Vercel Dashboard → Functions → <function> → Metrics
 ```
 
 **Root Causes:**
@@ -320,19 +318,20 @@ netlify logs:function --name=<function-name>
 # Increase function timeout (netlify.toml)
 # Add to function config:
 # [functions]
-#   node_bundler = "esbuild"
+#
 #   [functions."function-name"]
 #     timeout = 26
 
-# Optimize queries (add indexes in MongoDB)
-# Review slow queries in Atlas Performance Advisor
+# Optimize queries (add indexes in Supabase)
+# Review slow queries via Supabase Dashboard → Reports → Query Performance
+# (or pg_stat_statements via the SQL editor)
 
 # Add query timeouts
 # In function code:
 # const result = await collection.find().maxTimeMS(5000)
 
 # Redeploy
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -352,7 +351,7 @@ netlify deploy --prod
 # Navigate to: Insights → Errors
 
 # Check Netlify function logs
-netlify logs:function --name=<function-name> | grep ERROR
+vercel logs --follow | grep ERROR
 
 # Check browser console errors
 # Open: https://dobeu.net
@@ -370,10 +369,10 @@ netlify logs:function --name=<function-name> | grep ERROR
 
 ```bash
 # Rollback to previous deploy
-netlify rollback
+vercel rollback
 
 # Check CSP violations
-# Netlify Dashboard → Functions → __csp-violations
+# Vercel Dashboard → Functions → __csp-violations
 
 # Review recent changes
 git log --oneline -10
@@ -400,14 +399,14 @@ git diff HEAD~1
 npx lighthouse https://dobeu.net --view
 
 # Check CDN cache hit rate
-# Netlify Dashboard → Analytics → Bandwidth
+# Vercel Dashboard → Analytics → Bandwidth
 
 # Check bundle size
 npm run build
 ls -lh dist/assets/*.js
 
-# Check MongoDB query performance
-# Atlas Dashboard → Performance Advisor
+# Check Supabase query performance
+# Supabase Dashboard → Performance Advisor
 ```
 
 **Root Causes:**
@@ -441,49 +440,46 @@ npx vite-bundle-visualizer
 
 ## Diagnostic Commands
 
-### Netlify CLI
+### Vercel CLI
 
 ```bash
 # Check deployment status
-netlify status
+vercel inspect
 
 # View recent deploys
-netlify deploy:list
+vercel ls
 
 # View function logs (last 100 lines)
-netlify logs:function --name=<function-name>
+vercel logs --follow
 
 # View deploy logs
-netlify logs:deploy
+vercel logs
 
 # List environment variables
-netlify env:list
+vercel env ls
 
-# Test function locally
-netlify dev
+# Run dev server (Vite + Vercel functions)
+npm run dev
 
 # Deploy to production
-export NETLIFY_AUTH_TOKEN="<token>"
-netlify deploy --prod --dir=dist
+export VERCEL_TOKEN="<token>"
+vercel deploy --prod --dir=dist
 ```
 
-### MongoDB Atlas
+### Supabase Postgres (db-dobeutech-unified)
 
 ```bash
-# Connect via mongosh
-mongosh "mongodb+srv://<cluster>.mongodb.net/" \
-  --tls \
-  --tlsCAFile <cert.pem> \
-  --tlsCertificateKeyFile <cert.pem>
+# Connect via psql (use SUPABASE_DB_URL — the Postgres DSN, not the HTTPS API URL)
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
-# Check connection count
-db.serverStatus().connections
+# Connection count
+psql "$SUPABASE_DB_URL" -c "SELECT count(*) FROM pg_stat_activity;"
 
-# Check slow queries
-db.system.profile.find().sort({ts:-1}).limit(10)
+# Slow queries (requires pg_stat_statements extension)
+psql "$SUPABASE_DB_URL" -c "SELECT query, calls, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;"
 
-# Check database size
-db.stats()
+# Database size
+psql "$SUPABASE_DB_URL" -c "SELECT pg_size_pretty(pg_database_size(current_database()));"
 
 # Check collection stats
 db.<collection>.stats()
@@ -550,10 +546,10 @@ ls -lh dist/assets/*.js
 
 ```bash
 # Via Netlify CLI
-netlify rollback
+vercel rollback
 
-# Or via Netlify Dashboard
-# 1. Go to: https://app.netlify.com/projects/dobeutech/deploys
+# Or via Vercel Dashboard
+# 1. Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 # 2. Find last successful deploy
 # 3. Click "Publish deploy"
 ```
@@ -572,17 +568,17 @@ git push origin main
 git reset --hard <commit-hash>
 git push origin main --force
 
-# Netlify will auto-deploy
+# Vercel will auto-deploy
 ```
 
 ### Database Rollback
 
 ```bash
-# MongoDB Atlas Point-in-Time Restore
-# 1. Go to: Atlas Dashboard → Clusters → <cluster>
-# 2. Click "..." → "Restore"
-# 3. Select point in time
-# 4. Restore to new cluster or overwrite
+# Supabase Postgres (db-dobeutech-unified) Point-in-Time Restore
+# 1. Go to: Supabase Dashboard → Project db-dobeutech-unified → Database → Backups
+# 2. Choose "Point in time recovery" (PITR)
+# 3. Select target timestamp
+# 4. Confirm restore (this writes over the current branch / project state)
 
 # Note: This is destructive. Coordinate with team.
 ```
@@ -632,8 +628,8 @@ git push origin main --force
 
 **External Support**
 
-- Netlify Support: https://www.netlify.com/support/
-- MongoDB Atlas Support: https://support.mongodb.com/
+- Vercel Support: https://www.vercel.com/help
+- Supabase Support: https://supabase.com/support
 - Auth0 Support: https://support.auth0.com/
 
 ---
@@ -657,13 +653,13 @@ npx tsc --noEmit
 npm run build
 
 # 5. Verify environment variables
-netlify env:list
+vercel env ls
 
 # 6. Run deployment checklist
 node scripts/deploy-checklist.js
 
 # 7. Deploy to production
-netlify deploy --prod --dir=dist
+vercel deploy --prod --dir=dist
 ```
 
 ---
@@ -697,8 +693,8 @@ After resolving an incident:
 ## Useful Links
 
 - **Production Site:** https://dobeu.net
-- **Netlify Dashboard:** https://app.netlify.com/projects/dobeutech
-- **MongoDB Atlas:** https://cloud.mongodb.com/
+- **Vercel Dashboard:** https://vercel.com/dobeutechnology/dobeunet-vercel
+- **Supabase Postgres (db-dobeutech-unified):** https://supabase.com/dashboard/
 - **Auth0 Dashboard:** https://manage.auth0.com/
 - **PostHog:** https://us.posthog.com/
 - **GitHub Repo:** https://github.com/dobeutech/digital-wharf-dynamics

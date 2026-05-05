@@ -10,14 +10,14 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 
 ---
 
-## 1. Netlify Monitoring
+## 1. Vercel Monitoring
 
 ### Deploy Notifications
 
 **Setup Slack Integration:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Go to: Site Settings → Build & Deploy → Deploy notifications
 # 2. Click "Add notification"
 # 3. Select "Slack"
@@ -31,7 +31,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Email Notifications:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Site Settings → Build & Deploy → Deploy notifications
 # 2. Add notification → Email
 # 3. Add emails: oncall@dobeu.wtf, engineering@dobeu.wtf
@@ -43,9 +43,9 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Enable Function Logs:**
 
 ```bash
-# In netlify.toml
+# In vercel.json
 [functions]
-  node_bundler = "esbuild"
+
 
 [functions.settings]
   # Log all function invocations
@@ -55,7 +55,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Set Up Alerts:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Functions → Select function
 # 2. Metrics → Set up alerts
 # 3. Configure:
@@ -66,11 +66,11 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 
 ---
 
-## 2. MongoDB Atlas Monitoring
+## 2. Supabase Postgres (db-dobeutech-unified) Monitoring
 
 ### Performance Alerts
 
-**Setup in Atlas Dashboard:**
+**Setup in Supabase Dashboard:**
 
 ```bash
 # 1. Go to: Alerts → Create Alert
@@ -109,25 +109,26 @@ Action: Email + PagerDuty
 
 ### Query Performance
 
-**Enable Profiler:**
+**Enable slow-query logging (Postgres `pg_stat_statements`):**
 
-```javascript
-// In MongoDB shell
-use admin
-db.setProfilingLevel(1, { slowms: 100 })
+```sql
+-- Run once via Supabase SQL editor
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
-// Check slow queries
-use <database>
-db.system.profile.find().sort({ts:-1}).limit(10)
+-- Top 10 slowest queries
+SELECT query, calls, mean_exec_time, total_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
 ```
 
-**Performance Advisor:**
+**Performance tooling:**
 
-```bash
-# Enable in Atlas Dashboard
-# 1. Go to: Performance Advisor
-# 2. Enable automatic index suggestions
-# 3. Review weekly
+```text
+# In the Supabase Dashboard for project `db-dobeutech-unified`:
+# 1. Reports → Query Performance — slow queries, top calls
+# 2. Database → Indexes — review index hit rate
+# 3. Advisors → Performance Advisor — automatic suggestions
 ```
 
 ---
@@ -341,29 +342,34 @@ aws logs create-log-stream \
 
 ### Create Health Check Endpoint
 
-**netlify/functions/health.ts:**
+**api/health.ts (Vercel `@vercel/node` runtime):**
 
 ```typescript
-import { Handler } from "@netlify/functions";
-import { MongoClient } from "mongodb";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { createClient } from "@supabase/supabase-js";
 
-export const handler: Handler = async () => {
+export default async function handler(
+  _req: VercelRequest,
+  res: VercelResponse,
+) {
   const checks = {
     timestamp: new Date().toISOString(),
-    status: "healthy",
-    checks: {} as Record<string, any>,
+    status: "healthy" as "healthy" | "unhealthy",
+    checks: {} as Record<string, { status: string; message?: string }>,
   };
 
-  // Check MongoDB
+  // Check Supabase
   try {
-    const client = new MongoClient(process.env.MONGODB_URI!);
-    await client.connect();
-    await client.db().admin().ping();
-    await client.close();
-    checks.checks.mongodb = { status: "ok" };
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
+    );
+    const { error } = await supabase.from("services").select("id").limit(1);
+    if (error) throw error;
+    checks.checks.supabase = { status: "ok" };
   } catch (error) {
     checks.status = "unhealthy";
-    checks.checks.mongodb = {
+    checks.checks.supabase = {
       status: "error",
       message: (error as Error).message,
     };
@@ -387,17 +393,11 @@ export const handler: Handler = async () => {
     };
   }
 
-  const statusCode = checks.status === "healthy" ? 200 : 503;
-
-  return {
-    statusCode,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-    },
-    body: JSON.stringify(checks, null, 2),
-  };
-};
+  res
+    .setHeader("Cache-Control", "no-cache")
+    .status(checks.status === "healthy" ? 200 : 503)
+    .json(checks);
+}
 ```
 
 ---
@@ -427,7 +427,7 @@ export const handler: Handler = async () => {
 - Error rate > 5% for 10 minutes
 - Function timeout rate > 20%
 - Response time > 5s (p95)
-- MongoDB connections > 200
+- Supabase connections > 200
 
 **P2 Alerts:**
 
@@ -473,7 +473,7 @@ Type: Graph
 Alert: > 5s
 
 # Panel 5: Database Connections
-Query: mongodb_connections_current
+Query: pg_stat_database.numbackends
 Type: Gauge
 Alert: > 150
 ```
@@ -534,13 +534,13 @@ Alert: > 150
 
 - [ ] Check Netlify deploy status
 - [ ] Review error logs in PostHog
-- [ ] Check MongoDB connection count
-- [ ] Review slow queries in Atlas
+- [ ] Check Supabase connection count
+- [ ] Review slow queries in Supabase Reports
 
 **Weekly:**
 
 - [ ] Review Lighthouse scores
-- [ ] Check disk space in MongoDB
+- [ ] Check disk space in Supabase
 - [ ] Review function performance metrics
 - [ ] Update monitoring dashboards
 
@@ -564,7 +564,7 @@ curl -X POST <slack-webhook-url> \
   -d '{"text":"Test alert from monitoring system"}'
 
 # Test email alerts
-# Trigger a test alert in Netlify/Atlas dashboard
+# Trigger a test alert in Vercel/Supabase dashboards
 
 # Test PagerDuty
 # Use PagerDuty test incident feature
@@ -603,7 +603,7 @@ GROUP BY distinct_id
 HAVING error_count > 5
 ```
 
-### MongoDB Queries
+### Supabase Queries
 
 ```javascript
 // Find slow queries
