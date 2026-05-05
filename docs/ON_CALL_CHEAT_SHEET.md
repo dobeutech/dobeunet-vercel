@@ -64,7 +64,7 @@ echo "✅ Basic health OK"
 
 ```bash
 # Function logs (last 50 lines)
-vercel logs --follow | tail -50
+vercel logs --since 30m
 
 # Deploy logs
 vercel logs
