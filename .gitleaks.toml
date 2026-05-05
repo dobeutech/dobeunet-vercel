@@ -1,0 +1,19 @@
+# Extends the default gitleaks ruleset.
+# Supabase publishable/anon keys are designed to be embedded in client code;
+# they are not secrets. Keep the scanner from flagging .env.example placeholders
+# and any past commits that briefly held them.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public-by-design Supabase keys and example env templates"
+paths = [
+  '''\.env\.example$''',
+  '''\.env\.example\.[a-z]+$''',
+]
+regexes = [
+  # Supabase publishable keys (sb_publishable_...)
+  '''sb_publishable_[A-Za-z0-9_-]+''',
+  # Supabase anon JWT tied to project ref qdwvcrmdqweojverdmmz (publishable by design)
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkd3Zjcm1kcXdlb2p2ZXJkbW16[A-Za-z0-9._-]+''',
+]
