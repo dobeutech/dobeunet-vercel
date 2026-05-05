@@ -8,20 +8,20 @@ Comprehensive AI agent guidelines for working on the DOBEU Tech Solutions codeba
 
 **DOBEU** is a premium digital services platform offering web development, software solutions, and consulting.
 
-| Category         | Technologies                         |
-| ---------------- | ------------------------------------ |
-| **Frontend**     | React 18, TypeScript 5, Vite 7       |
-| **UI**           | Tailwind CSS, Radix UI, shadcn/ui    |
-| **Animation**    | Framer Motion (`motion/react`)       |
-| **Backend**      | Vercel Serverless Functions (Node)   |
-| **Auth**         | Auth0 (SPA + JWT) + Supabase Auth    |
+| Category         | Technologies                                   |
+| ---------------- | ---------------------------------------------- |
+| **Frontend**     | React 18, TypeScript 5, Vite 7                 |
+| **UI**           | Tailwind CSS, Radix UI, shadcn/ui              |
+| **Animation**    | Framer Motion (`motion/react`)                 |
+| **Backend**      | Vercel Serverless Functions (Node)             |
+| **Auth**         | Auth0 (SPA + JWT) + Supabase Auth              |
 | **Database**     | Supabase (PostgreSQL) — `db-dobeutech-unified` |
-| **File Storage** | Supabase Storage                     |
-| **Payments**     | Stripe                               |
-| **SMS**          | Twilio                               |
-| **Analytics**    | PostHog, Mixpanel, Google Analytics  |
-| **Hosting**      | Vercel (Edge, CDN, Functions)        |
-| **Testing**      | Vitest (unit), Playwright (E2E)      |
+| **File Storage** | Supabase Storage                               |
+| **Payments**     | Stripe                                         |
+| **SMS**          | Twilio                                         |
+| **Analytics**    | PostHog, Mixpanel, Google Analytics            |
+| **Hosting**      | Vercel (Edge, CDN, Functions)                  |
+| **Testing**      | Vitest (unit), Playwright (E2E)                |
 
 ---
 
@@ -59,9 +59,10 @@ src/
 └── __tests__/            # Test files
 
 api/                      # Vercel serverless API endpoints
-├── _auth0.ts             # Auth0 JWT verification
-├── _supabase.ts          # Supabase server client
-├── _http.ts              # HTTP utilities
+├── _helpers/             # Shared helpers
+│   ├── auth0.ts          # Auth0 JWT verification
+│   ├── supabase.ts       # Supabase server client (getSupabaseClient)
+│   └── http.ts           # HTTP utilities
 └── *.ts                  # API endpoints
 
 supabase/
@@ -208,7 +209,7 @@ function MyComponent() {
 
 ---
 
-## Backend Patterns (Netlify Functions)
+## Backend Patterns (Vercel Functions)
 
 ### Basic Function Template
 
@@ -252,7 +253,7 @@ export const handler: Handler = async (
 
 ```typescript
 import { requireAuth, Auth0Claims } from "./_auth0";
-import { getSupabaseAdmin } from "./_supabase";
+import { getSupabaseClient } from "./_helpers/supabase";
 
 export const handler: Handler = async (event) => {
   try {
@@ -260,7 +261,7 @@ export const handler: Handler = async (event) => {
     const user: Auth0Claims = await requireAuth(event);
 
     // Server-side Supabase client (service role)
-    const supabase = getSupabaseAdmin();
+    const supabase = getSupabaseClient();
 
     // Query with user context
     const { data, error } = await supabase
@@ -308,9 +309,9 @@ All data lives in Supabase Postgres project **`db-dobeutech-unified`**
 ### Supabase Operations
 
 ```typescript
-import { getSupabaseAdmin } from "./_supabase";
+import { getSupabaseClient } from "./_helpers/supabase";
 
-const supabase = getSupabaseAdmin();
+const supabase = getSupabaseClient();
 
 // Select
 const { data, error } = await supabase
@@ -322,7 +323,10 @@ const { data, error } = await supabase
 await supabase.from("table_name").insert({ ...data });
 
 // Update
-await supabase.from("table_name").update({ ...updates }).eq("id", id);
+await supabase
+  .from("table_name")
+  .update({ ...updates })
+  .eq("id", id);
 
 // Delete
 await supabase.from("table_name").delete().eq("id", id);

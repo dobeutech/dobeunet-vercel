@@ -76,11 +76,9 @@ netlify deploy --prod
 # 1. Check Supabase Postgres (db-dobeutech-unified) status
 # Visit: https://status.supabase.com/
 
-# 2. Test connection
-psql "$SUPABASE_URL" \
-  --tls \
-  --tlsCAFile <cert.pem> \
-  --tlsCertificateKeyFile <cert.pem>
+# 2. Test connection (Postgres DSN, not the HTTPS API URL)
+#    Get the connection string from Supabase Dashboard → Settings → Database
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # 3. Check function logs
 netlify logs:function --name=projects | grep -i "supabase\|connection\|timeout"
@@ -127,8 +125,8 @@ git log --oneline -5
 netlify rollback
 
 # If CSP blocking resources:
-# 1. Check violations: Netlify → Functions → __csp-violations
-# 2. Update CSP in netlify.toml
+# 1. Check violations: Vercel → Project → Functions → Logs
+# 2. Update CSP in vercel.json
 # 3. Redeploy
 
 # If rate limiting:
@@ -169,7 +167,7 @@ ls -lh dist/assets/*.js
 
 # If CDN cache misses:
 # - Check Cache-Control headers
-# - Verify cache settings in netlify.toml
+# - Verify cache settings in vercel.json
 ```
 
 ---
@@ -200,7 +198,7 @@ npx tsc --noEmit
 # Fix errors, commit, push
 
 # If out of memory:
-# - Increase Node memory in netlify.toml
+# - Increase Node memory in vercel.json
 # - Add: NODE_OPTIONS="--max-old-space-size=4096"
 
 # If env vars missing:

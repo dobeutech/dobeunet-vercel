@@ -284,8 +284,9 @@ export NETLIFY_AUTH_TOKEN="<token>"
 ### Supabase
 
 ```bash
-# Certificate location: (no client certs needed for Supabase TLS)
-# Connection string in: Netlify env vars
+# Connection string lives in Vercel Project Settings → Environment Variables
+# (SUPABASE_DB_URL).  No client certs needed; TLS is automatic.
+# Test it: psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 ```
 
 ### Auth0
@@ -316,7 +317,7 @@ netlify status
 netlify deploy:list | head -5
 
 # Test database
-psql "$SUPABASE_URL" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # Response time
 time curl -s https://dobeu.net > /dev/null
@@ -372,11 +373,11 @@ netlify deploy --prod --dir=dist
 
 ## 📞 EXTERNAL SUPPORT
 
-| Service | Support                          |
-| ------- | -------------------------------- |
-| Netlify | https://www.netlify.com/support/ |
+| Service  | Support                          |
+| -------- | -------------------------------- |
+| Netlify  | https://www.netlify.com/support/ |
 | Supabase | https://supabase.com/support     |
-| Auth0   | https://support.auth0.com/       |
+| Auth0    | https://support.auth0.com/       |
 
 ---
 
@@ -400,9 +401,9 @@ netlify deploy --prod --dir=dist
 
 ---
 
-**Print Date:** ****\_\_\_****  
-**On-Call Period:** ****\_\_\_****  
-**Backup Contact:** ****\_\_\_****
+**Print Date:** \***\*\_\_\_\*\***  
+**On-Call Period:** \***\*\_\_\_\*\***  
+**Backup Contact:** \***\*\_\_\_\*\***
 
 ---
 

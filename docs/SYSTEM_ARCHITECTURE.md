@@ -704,8 +704,8 @@ graph TB
 
     subgraph "Database"
         Primary[Supabase Primary]
-        Secondary1[Supabase Secondary 1]
-        Secondary2[Supabase Secondary 2]
+        Replica1[Supabase Read Replica 1]
+        Replica2[Supabase Read Replica 2]
     end
 
     Domain --> Netlify
@@ -718,8 +718,8 @@ graph TB
     Edge2 --> Functions
     Edge2 --> Static
     Functions --> Primary
-    Primary --> Secondary1
-    Primary --> Secondary2
+    Primary --> Replica1
+    Primary --> Replica2
 ```
 
 ---
