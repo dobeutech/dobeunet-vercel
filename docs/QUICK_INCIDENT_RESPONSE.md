@@ -94,12 +94,12 @@ netlify logs:function --name=projects | grep -i "supabase\|connection\|timeout"
 netlify deploy --prod
 
 # If certificate expired:
-# 1. Download new cert from Atlas
-# 2. Update MONGODB_CERT env var
+# 1. Supabase manages TLS automatically — no manual cert download
+# 2. Update SUPABASE_DB_URL env var
 # 3. Redeploy
 
 # If IP whitelist issue:
-# - Add Netlify IPs to Atlas whitelist
+# - Add Vercel egress IPs to Supabase Network Restrictions (Settings → Database)
 # - Or use 0.0.0.0/0 (less secure)
 ```
 
@@ -163,7 +163,7 @@ ls -lh dist/assets/*.js
 # Optimize: code splitting, lazy loading
 
 # If slow queries:
-# - Check Atlas Performance Advisor
+# - Check Supabase Reports → Query Performance
 # - Add indexes
 # - Optimize queries
 
@@ -316,7 +316,7 @@ netlify status && echo "✅ Netlify OK"
 netlify logs:function --name=<function> | grep ERROR | tail -20
 
 # Test database connection
-psql "$SUPABASE_URL" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # Deploy to production
 export NETLIFY_AUTH_TOKEN="<token>"

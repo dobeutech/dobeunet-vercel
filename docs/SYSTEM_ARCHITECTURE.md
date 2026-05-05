@@ -390,7 +390,7 @@ erDiagram
         string filename
         string content_type
         int size
-        string gridfs_id
+        string storage_path
         datetime uploaded_at
     }
 ```
@@ -424,7 +424,7 @@ graph LR
     subgraph "Monitoring"
         Netlify[Netlify Logs]
         PostHog[PostHog Events]
-        Atlas[Supabase Metrics]
+        SBMetrics[Supabase Logs & Metrics]
     end
 
     Dev --> Git
@@ -438,7 +438,7 @@ graph LR
     PR --> Prod
     Prod --> Netlify
     Prod --> PostHog
-    Prod --> Atlas
+    Prod --> Supa
     Prod --> Rollback
 ```
 
@@ -474,7 +474,7 @@ graph TB
     end
 
     subgraph "Database"
-        Mongo[Supabase Postgres (db-dobeutech-unified)]
+        Supa[Supabase Postgres db-dobeutech-unified]
     end
 
     App --> AuthSDK
@@ -486,7 +486,7 @@ graph TB
     App --> IC
     App --> TF
     App --> Stripe
-    App --> Mongo
+    App --> Supa
 ```
 
 ---
@@ -556,8 +556,8 @@ graph TB
     end
 
     subgraph "Database"
-        Atlas[Supabase Postgres (db-dobeutech-unified)]
-        GridFS[GridFS]
+        Supa[Supabase Postgres db-dobeutech-unified]
+        SupaStor[Supabase Storage]
         Indexes[Indexes]
     end
 
@@ -571,9 +571,9 @@ graph TB
     Netlify --> Functions
     Functions --> Node
     Functions --> TS
-    Functions --> Atlas
-    Atlas --> GridFS
-    Atlas --> Indexes
+    Functions --> Supa
+    Supa --> SupaStor
+    Supa --> Indexes
     Functions --> Auth0
     Auth0 --> JWT
 ```
@@ -649,7 +649,7 @@ graph TB
     end
 
     subgraph "Database Monitoring"
-        Atlas[Supabase Postgres (db-dobeutech-unified)]
+        Supa[Supabase Postgres db-dobeutech-unified]
         Perf[Performance Advisor]
         Slow[Slow Query Logs]
     end
@@ -672,7 +672,7 @@ graph TB
     Boundary --> Toast
     Netlify --> Functions
     Functions --> CDN
-    Atlas --> Perf
+    Supa --> Perf
     Perf --> Slow
     Slow --> Email
     Email --> Slack
@@ -731,14 +731,14 @@ graph TB
     subgraph "Horizontal Scaling"
         CDN[CDN Edge Nodes]
         Functions[Serverless Functions]
-        DB[Supabase Sharding]
+        DB[Supabase Read Replicas + Connection Pooling]
     end
 
     subgraph "Caching"
         Browser[Browser Cache]
         CDNCache[CDN Cache]
         QueryCache[React Query Cache]
-        DBCache[Supabase Cache]
+        PGBouncer[Supabase pgbouncer pool]
     end
 
     subgraph "Optimization"

@@ -284,7 +284,7 @@ export NETLIFY_AUTH_TOKEN="<token>"
 ### Supabase
 
 ```bash
-# Certificate location: ~/.mongodb/cert.pem
+# Certificate location: (no client certs needed for Supabase TLS)
 # Connection string in: Netlify env vars
 ```
 
@@ -375,7 +375,7 @@ netlify deploy --prod --dir=dist
 | Service | Support                          |
 | ------- | -------------------------------- |
 | Netlify | https://www.netlify.com/support/ |
-| Supabase | https://support.mongodb.com/     |
+| Supabase | https://supabase.com/support     |
 | Auth0   | https://support.auth0.com/       |
 
 ---

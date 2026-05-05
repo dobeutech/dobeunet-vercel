@@ -143,7 +143,7 @@ netlify logs:function --name=<function-name>
 netlify logs:deploy
 
 # Supabase logs
-# Atlas Dashboard → Metrics → Logs
+# Supabase Dashboard → Logs Explorer (Postgres / API / Auth / Storage)
 ```
 
 **Reference:** [Runbook → Diagnostic Commands](./OPERATIONAL_RUNBOOK.md#diagnostic-commands)
@@ -158,7 +158,7 @@ curl -I https://dobeu.net
 curl https://dobeu.net/.netlify/functions/health
 
 # Database connection
-mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 ```
 
 **Reference:** [Runbook → Diagnostic Commands](./OPERATIONAL_RUNBOOK.md#diagnostic-commands)
@@ -191,20 +191,20 @@ mongosh "mongodb+srv://<cluster>.mongodb.net/" --eval "db.runCommand({ping:1})"
 ### Dashboards
 
 - **Netlify:** https://app.netlify.com/projects/dobeutech
-- **Supabase Postgres (db-dobeutech-unified):** https://cloud.mongodb.com/
+- **Supabase (db-dobeutech-unified):** https://supabase.com/dashboard/project/qdwvcrmdqweojverdmmz
 - **PostHog:** https://us.posthog.com/
 - **Auth0:** https://manage.auth0.com/
 
 ### Status Pages
 
 - **Netlify Status:** https://www.netlifystatus.com/
-- **Supabase Status:** https://status.mongodb.com/
+- **Supabase Status:** https://status.supabase.com/
 - **Auth0 Status:** https://status.auth0.com/
 
 ### Documentation
 
 - **Netlify Docs:** https://docs.netlify.com/
-- **Supabase Docs:** https://docs.mongodb.com/
+- **Supabase Docs:** https://supabase.com/docs
 - **Auth0 Docs:** https://auth0.com/docs/
 
 ---

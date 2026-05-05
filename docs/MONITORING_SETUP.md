@@ -70,7 +70,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 
 ### Performance Alerts
 
-**Setup in Atlas Dashboard:**
+**Setup in Supabase Dashboard:**
 
 ```bash
 # 1. Go to: Alerts → Create Alert
@@ -109,25 +109,26 @@ Action: Email + PagerDuty
 
 ### Query Performance
 
-**Enable Profiler:**
+**Enable slow-query logging (Postgres `pg_stat_statements`):**
 
-```javascript
-// In Supabase shell
-use admin
-db.setProfilingLevel(1, { slowms: 100 })
+```sql
+-- Run once via Supabase SQL editor
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
-// Check slow queries
-use <database>
-db.system.profile.find().sort({ts:-1}).limit(10)
+-- Top 10 slowest queries
+SELECT query, calls, mean_exec_time, total_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
 ```
 
-**Performance Advisor:**
+**Performance tooling:**
 
-```bash
-# Enable in Atlas Dashboard
-# 1. Go to: Performance Advisor
-# 2. Enable automatic index suggestions
-# 3. Review weekly
+```text
+# In the Supabase Dashboard for project `db-dobeutech-unified`:
+# 1. Reports → Query Performance — slow queries, top calls
+# 2. Database → Indexes — review index hit rate
+# 3. Advisors → Performance Advisor — automatic suggestions
 ```
 
 ---
@@ -341,13 +342,12 @@ aws logs create-log-stream \
 
 ### Create Health Check Endpoint
 
-**netlify/functions/health.ts:**
+**api/health.ts (Vercel function):**
 
 ```typescript
-import { Handler } from "@netlify/functions";
-import { MongoClient } from "mongodb";
+import { createClient } from "@supabase/supabase-js";
 
-export const handler: Handler = async () => {
+export default async function handler(_req: Request) {
   const checks = {
     timestamp: new Date().toISOString(),
     status: "healthy",
@@ -356,14 +356,16 @@ export const handler: Handler = async () => {
 
   // Check Supabase
   try {
-    const client = new MongoClient(process.env.SUPABASE_URL!);
-    await client.connect();
-    await client.db().admin().ping();
-    await client.close();
-    checks.checks.mongodb = { status: "ok" };
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_ANON_KEY!,
+    );
+    const { error } = await supabase.from("services").select("id").limit(1);
+    if (error) throw error;
+    checks.checks.supabase = { status: "ok" };
   } catch (error) {
     checks.status = "unhealthy";
-    checks.checks.mongodb = {
+    checks.checks.supabase = {
       status: "error",
       message: (error as Error).message,
     };
@@ -473,7 +475,7 @@ Type: Graph
 Alert: > 5s
 
 # Panel 5: Database Connections
-Query: mongodb_connections_current
+Query: pg_stat_database.numbackends
 Type: Gauge
 Alert: > 150
 ```
@@ -535,7 +537,7 @@ Alert: > 150
 - [ ] Check Netlify deploy status
 - [ ] Review error logs in PostHog
 - [ ] Check Supabase connection count
-- [ ] Review slow queries in Atlas
+- [ ] Review slow queries in Supabase Reports
 
 **Weekly:**
 
@@ -564,7 +566,7 @@ curl -X POST <slack-webhook-url> \
   -d '{"text":"Test alert from monitoring system"}'
 
 # Test email alerts
-# Trigger a test alert in Netlify/Atlas dashboard
+# Trigger a test alert in Vercel/Supabase dashboards
 
 # Test PagerDuty
 # Use PagerDuty test incident feature

@@ -57,7 +57,7 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 1. User requests → Netlify Edge (CDN)
 2. Static assets served from CDN
 3. API calls → Netlify Functions
-4. Functions → Supabase Postgres (db-dobeutech-unified) (X.509 auth)
+4. Functions → Supabase Postgres `db-dobeutech-unified` (TLS, service-role key on the server, anon/publishable key in the browser; RLS enforces row-level access)
 5. Auth → Auth0 (OAuth2/OIDC)
 
 ---
@@ -76,7 +76,7 @@ User → Cloudflare/Netlify CDN → Static Assets (React SPA)
 
 - URL: https://supabase.com/dashboard/
 - Metrics: Connection count, query performance, storage
-- Access: X.509 certificate required
+- Access: project member login (no client certs needed)
 
 **PostHog Dashboard**
 
@@ -204,7 +204,7 @@ psql "$SUPABASE_URL" \
   --tlsCAFile <path-to-cert.pem> \
   --tlsCertificateKeyFile <path-to-cert.pem>
 
-# Check connection pool metrics in Atlas dashboard
+# Check connection pool metrics in Supabase Dashboard
 # Navigate to: Metrics → Connections
 ```
 
@@ -212,14 +212,14 @@ psql "$SUPABASE_URL" \
 
 - Supabase Postgres (db-dobeutech-unified) outage
 - Connection pool exhaustion
-- X.509 certificate expired
+- TLS handshake / network egress issue
 - Network/firewall issues
 - IP whitelist misconfiguration
 
 **Mitigation:**
 
 ```bash
-# Check IP whitelist in Atlas
+# Check IP allowlist in Supabase Dashboard → Settings → Database
 # Navigate to: Network Access → IP Access List
 
 # Verify certificate validity
@@ -228,7 +228,7 @@ openssl x509 -in <cert.pem> -noout -dates
 # Restart functions (redeploy)
 netlify deploy --prod
 
-# If certificate expired, regenerate in Atlas:
+# If TLS cert pinned by Supabase, no manual rotation needed:
 # Database Access → Users → Download new certificate
 ```
 
@@ -301,7 +301,7 @@ git push origin main
 netlify logs:function --name=<function-name>
 
 # Check Supabase slow queries
-# Atlas Dashboard → Performance Advisor
+# Supabase Dashboard → Performance Advisor
 
 # Check function memory usage
 # Netlify Dashboard → Functions → <function> → Metrics
@@ -325,7 +325,8 @@ netlify logs:function --name=<function-name>
 #     timeout = 26
 
 # Optimize queries (add indexes in Supabase)
-# Review slow queries in Atlas Performance Advisor
+# Review slow queries via Supabase Dashboard → Reports → Query Performance
+# (or pg_stat_statements via the SQL editor)
 
 # Add query timeouts
 # In function code:
@@ -407,7 +408,7 @@ npm run build
 ls -lh dist/assets/*.js
 
 # Check Supabase query performance
-# Atlas Dashboard → Performance Advisor
+# Supabase Dashboard → Performance Advisor
 ```
 
 **Root Causes:**
@@ -470,7 +471,7 @@ netlify deploy --prod --dir=dist
 ### Supabase Postgres (db-dobeutech-unified)
 
 ```bash
-# Connect via mongosh
+# Connect via psql
 psql "$SUPABASE_URL" \
   --tls \
   --tlsCAFile <cert.pem> \
@@ -579,10 +580,10 @@ git push origin main --force
 
 ```bash
 # Supabase Postgres (db-dobeutech-unified) Point-in-Time Restore
-# 1. Go to: Atlas Dashboard → Clusters → <cluster>
-# 2. Click "..." → "Restore"
-# 3. Select point in time
-# 4. Restore to new cluster or overwrite
+# 1. Go to: Supabase Dashboard → Project db-dobeutech-unified → Database → Backups
+# 2. Choose "Point in time recovery" (PITR)
+# 3. Select target timestamp
+# 4. Confirm restore (this writes over the current branch / project state)
 
 # Note: This is destructive. Coordinate with team.
 ```
@@ -633,7 +634,7 @@ git push origin main --force
 **External Support**
 
 - Netlify Support: https://www.netlify.com/support/
-- Supabase Postgres (db-dobeutech-unified) Support: https://support.mongodb.com/
+- Supabase Support: https://supabase.com/support
 - Auth0 Support: https://support.auth0.com/
 
 ---
