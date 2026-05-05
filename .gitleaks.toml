@@ -23,5 +23,9 @@ regexes = [
 # Publishable/anon keys are designed to be embedded client-side and were
 # rotated/scoped by RLS, so this commit is safe to allowlist.
 commits = [
+  # Original PR commit briefly had Supabase publishable/anon keys in .env.example.
   "67e8e95fd27578b05f2c22ff96f257dbd6f7b7a2",
+  # Initial .gitleaks.toml briefly contained a literal JWT prefix as a regex
+  # before being rewritten to avoid the literal in 1e94577.
+  "1b935468aa6beecc3af24f20c0a7802439cbdc8a",
 ]
