@@ -18,3 +18,10 @@ regexes = [
   # Match without storing the literal JWT prefix to avoid recursive detection.
   '''[A-Za-z0-9]+\.[A-Za-z0-9]*qdwvcrmdqweojverdmmz[A-Za-z0-9._-]*''',
 ]
+# Commit-level allowlist: the original PR commit briefly had publishable
+# Supabase keys in .env.example before they were replaced with placeholders.
+# Publishable/anon keys are designed to be embedded client-side and were
+# rotated/scoped by RLS, so this commit is safe to allowlist.
+commits = [
+  "67e8e95fd27578b05f2c22ff96f257dbd6f7b7a2",
+]
