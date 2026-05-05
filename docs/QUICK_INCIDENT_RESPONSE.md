@@ -312,7 +312,7 @@ curl -I https://dobeu.net && echo "✅ Site up"
 vercel inspect && echo "✅ Vercel OK"
 
 # View recent errors
-vercel logs --follow | grep ERROR | tail -20
+vercel logs --since 30m | grep ERROR | tail -20
 
 # Test database connection
 psql "$SUPABASE_DB_URL" -c "SELECT 1;"
