@@ -42,8 +42,23 @@ jobs:
             | tar -xz -C /tmp gitleaks
           sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
           gitleaks version
-      - name: Run gitleaks
-        run: gitleaks detect --source=. --config=.gitleaks.toml --redact --verbose --no-banner
+      - name: Run gitleaks (PR diff only)
+        # Only scan commits introduced by this PR/push, not the full repo history.
+        # The repo has pre-existing secrets in legacy docs (Netlify tokens, JWTs, etc.)
+        # that are out of scope for any single PR.
+        run: |
+          if [ -n "$GITHUB_BASE_REF" ]; then
+            git fetch origin "$GITHUB_BASE_REF" --depth=1
+            RANGE="origin/${GITHUB_BASE_REF}..HEAD"
+          else
+            RANGE="HEAD~1..HEAD"
+          fi
+          echo "Scan range: $RANGE"
+          gitleaks detect \
+            --source=. \
+            --config=.gitleaks.toml \
+            --log-opts="$RANGE" \
+            --redact --verbose --no-banner
 
   codeql:
     name: CodeQL Analysis
