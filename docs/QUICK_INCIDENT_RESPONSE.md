@@ -45,7 +45,7 @@ vercel ls | head -5
 curl https://status.auth0.com/api/v2/status.json
 
 # 2. Check Auth0 function logs
-vercel logs --follow | tail -50
+vercel logs --since 30m
 
 # 3. Verify env vars
 vercel env ls | grep AUTH0

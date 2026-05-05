@@ -36,8 +36,8 @@
 
 ### Critical Dependencies
 
-- **Vercel Functions:** 17 serverless functions
-- **Edge Functions:** 4 edge functions (CSP, prerender, UA blocker)
+- **Vercel Functions:** 16 serverless functions (`api/*.ts`)
+- **Edge Middleware:** Static CSP/security headers configured in `vercel.json` (no custom edge functions in this repo)
 - **External APIs:** Auth0, Supabase, Stripe, Intercom, PostHog
 
 ---
@@ -109,7 +109,7 @@ User → Vercel Edge Network → Static Assets (React SPA)
 **Triage Steps:**
 
 ```bash
-# Check Netlify deploy status
+# Check Vercel deploy status
 vercel inspect
 
 # Check latest deploy logs
@@ -440,7 +440,7 @@ npx vite-bundle-visualizer
 
 ## Diagnostic Commands
 
-### Netlify CLI
+### Vercel CLI
 
 ```bash
 # Check deployment status
@@ -458,8 +458,8 @@ vercel logs
 # List environment variables
 vercel env ls
 
-# Test function locally
-netlify dev
+# Run dev server (Vite + Vercel functions)
+npm run dev
 
 # Deploy to production
 export VERCEL_TOKEN="<token>"
@@ -469,20 +469,17 @@ vercel deploy --prod --dir=dist
 ### Supabase Postgres (db-dobeutech-unified)
 
 ```bash
-# Connect via psql
-psql "$SUPABASE_URL" \
-  --tls \
-  --tlsCAFile <cert.pem> \
-  --tlsCertificateKeyFile <cert.pem>
+# Connect via psql (use SUPABASE_DB_URL — the Postgres DSN, not the HTTPS API URL)
+psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
-# Check connection count
-db.serverStatus().connections
+# Connection count
+psql "$SUPABASE_DB_URL" -c "SELECT count(*) FROM pg_stat_activity;"
 
-# Check slow queries
-db.system.profile.find().sort({ts:-1}).limit(10)
+# Slow queries (requires pg_stat_statements extension)
+psql "$SUPABASE_DB_URL" -c "SELECT query, calls, mean_exec_time FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 10;"
 
-# Check database size
-db.stats()
+# Database size
+psql "$SUPABASE_DB_URL" -c "SELECT pg_size_pretty(pg_database_size(current_database()));"
 
 # Check collection stats
 db.<collection>.stats()

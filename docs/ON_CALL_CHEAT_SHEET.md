@@ -28,7 +28,7 @@ vercel rollback
 
 ```bash
 curl https://status.auth0.com/api/v2/status.json
-vercel logs --follow | tail -20
+vercel logs --since 15m
 ```
 
 ### Database Down
@@ -42,7 +42,7 @@ vercel logs --follow | grep -i supabase
 
 ## 📊 DASHBOARDS (Check in Order)
 
-1. **Netlify:** https://vercel.com/dobeutechnology/dobeunet-vercel
+1. **Vercel:** https://vercel.com/dobeutechnology/dobeunet-vercel
 2. **PostHog:** https://us.posthog.com/
 3. **Supabase:** https://supabase.com/dashboard/
 4. **Auth0:** https://manage.auth0.com/
@@ -375,7 +375,7 @@ vercel deploy --prod --dir=dist
 
 | Service  | Support                      |
 | -------- | ---------------------------- |
-| Netlify  | https://www.vercel.com/help  |
+| Vercel   | https://vercel.com/help      |
 | Supabase | https://supabase.com/support |
 | Auth0    | https://support.auth0.com/   |
 

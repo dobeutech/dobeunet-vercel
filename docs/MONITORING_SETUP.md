@@ -10,7 +10,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 
 ---
 
-## 1. Netlify Monitoring
+## 1. Vercel Monitoring
 
 ### Deploy Notifications
 
@@ -43,7 +43,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Enable Function Logs:**
 
 ```bash
-# In netlify.toml
+# In vercel.json
 [functions]
 
 

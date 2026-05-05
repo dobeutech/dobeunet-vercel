@@ -43,22 +43,31 @@ jobs:
           sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
           gitleaks version
       - name: Run gitleaks (PR diff only)
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
         # Only scan commits introduced by this PR/push, not the full repo history.
         # The repo has pre-existing secrets in legacy docs (Netlify tokens, JWTs, etc.)
         # that are out of scope for any single PR.
         run: |
+          # Pull request: scan commits unique to the PR.
+          # Push: scan commits introduced by the push (github.event.before..HEAD).
+          # Schedule: scan working tree only (full-history scan would re-flag
+          # all pre-existing legacy secrets every Sunday).
           if [ -n "$GITHUB_BASE_REF" ]; then
-            git fetch origin "$GITHUB_BASE_REF" --depth=1
+            git fetch origin "$GITHUB_BASE_REF" --depth=50
             RANGE="origin/${GITHUB_BASE_REF}..HEAD"
+          elif [ -n "$GITHUB_EVENT_BEFORE" ] && [ "$GITHUB_EVENT_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            RANGE="${GITHUB_EVENT_BEFORE}..${GITHUB_SHA}"
           else
-            RANGE="HEAD~1..HEAD"
+            RANGE=""   # falls through to --no-git below
           fi
           echo "Scan range: $RANGE"
-          gitleaks detect \
-            --source=. \
-            --config=.gitleaks.toml \
-            --log-opts="$RANGE" \
-            --redact --verbose --no-banner
+          if [ -z "$RANGE" ]; then
+            gitleaks detect --source=. --config=.gitleaks.toml --no-git --redact --verbose --no-banner
+          else
+            gitleaks detect --source=. --config=.gitleaks.toml --log-opts="$RANGE" --redact --verbose --no-banner
+          fi
 
   codeql:
     name: CodeQL Analysis
