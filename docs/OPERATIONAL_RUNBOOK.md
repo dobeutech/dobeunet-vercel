@@ -36,7 +36,7 @@
 
 ### Critical Dependencies
 
-- **Netlify Functions:** 17 serverless functions
+- **Vercel Functions:** 17 serverless functions
 - **Edge Functions:** 4 edge functions (CSP, prerender, UA blocker)
 - **External APIs:** Auth0, Supabase, Stripe, Intercom, PostHog
 
@@ -66,9 +66,9 @@ User → Vercel Edge Network → Static Assets (React SPA)
 
 ### Primary Dashboards
 
-**Netlify Dashboard**
+**Vercel Dashboard**
 
-- URL: https://app.netlify.com/projects/dobeutech
+- URL: https://vercel.com/dobeutechnology/dobeunet-vercel
 - Metrics: Deploy status, function invocations, bandwidth
 - Access: Team login required
 
@@ -103,17 +103,17 @@ User → Vercel Edge Network → Static Assets (React SPA)
 **Symptoms:**
 
 - Users report "Site unavailable"
-- Netlify shows failed deploy
+- Vercel shows failed deploy
 - 500 errors in browser console
 
 **Triage Steps:**
 
 ```bash
 # Check Netlify deploy status
-netlify status
+vercel inspect
 
 # Check latest deploy logs
-netlify logs:function --name=<function-name>
+vercel logs --follow
 
 # Check if site is accessible
 curl -I https://dobeu.net
@@ -130,11 +130,11 @@ curl -I https://dobeu.net
 
 ```bash
 # Rollback to last known good deploy
-netlify rollback
+vercel rollback
 
 # Or redeploy from main
 git checkout main
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -153,11 +153,11 @@ netlify deploy --prod
 # Check Auth0 status
 curl https://status.auth0.com/api/v2/status.json
 
-# Verify Auth0 env vars in Netlify
-netlify env:list | grep AUTH0
+# Verify Auth0 env vars in Vercel
+vercel env ls | grep AUTH0
 
 # Check function logs
-netlify logs:function --name=_auth0
+vercel logs --follow
 ```
 
 **Root Causes:**
@@ -174,12 +174,12 @@ netlify logs:function --name=_auth0
 # Check: https://manage.auth0.com/dashboard
 
 # Update Auth0 env vars if needed
-netlify env:set AUTH0_DOMAIN <value>
-netlify env:set AUTH0_CLIENT_ID <value>
-netlify env:set AUTH0_CLIENT_SECRET <value>
+vercel env add AUTH0_DOMAIN <value>
+vercel env add AUTH0_CLIENT_ID <value>
+vercel env add AUTH0_CLIENT_SECRET <value>
 
 # Redeploy
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -224,7 +224,7 @@ psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 openssl x509 -in <cert.pem> -noout -dates
 
 # Restart functions (redeploy)
-netlify deploy --prod
+vercel deploy --prod
 
 # If TLS cert pinned by Supabase, no manual rotation needed:
 # Database Access → Users → Download new certificate
@@ -236,16 +236,16 @@ netlify deploy --prod
 
 **Symptoms:**
 
-- Deploy fails in Netlify
+- Deploy fails in Vercel
 - "Build failed" notification
 - TypeScript/ESLint errors
 
 **Triage Steps:**
 
 ```bash
-# Check build logs in Netlify dashboard
+# Check build logs in Vercel dashboard
 # Or via CLI:
-netlify logs:deploy
+vercel logs
 
 # Reproduce locally
 npm run build
@@ -295,14 +295,14 @@ git push origin main
 **Triage Steps:**
 
 ```bash
-# Check function duration in Netlify
-netlify logs:function --name=<function-name>
+# Check function duration in Vercel
+vercel logs --follow
 
 # Check Supabase slow queries
 # Supabase Dashboard → Performance Advisor
 
 # Check function memory usage
-# Netlify Dashboard → Functions → <function> → Metrics
+# Vercel Dashboard → Functions → <function> → Metrics
 ```
 
 **Root Causes:**
@@ -318,7 +318,7 @@ netlify logs:function --name=<function-name>
 # Increase function timeout (netlify.toml)
 # Add to function config:
 # [functions]
-#   node_bundler = "esbuild"
+#
 #   [functions."function-name"]
 #     timeout = 26
 
@@ -331,7 +331,7 @@ netlify logs:function --name=<function-name>
 # const result = await collection.find().maxTimeMS(5000)
 
 # Redeploy
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ---
@@ -351,7 +351,7 @@ netlify deploy --prod
 # Navigate to: Insights → Errors
 
 # Check Netlify function logs
-netlify logs:function --name=<function-name> | grep ERROR
+vercel logs --follow | grep ERROR
 
 # Check browser console errors
 # Open: https://dobeu.net
@@ -369,10 +369,10 @@ netlify logs:function --name=<function-name> | grep ERROR
 
 ```bash
 # Rollback to previous deploy
-netlify rollback
+vercel rollback
 
 # Check CSP violations
-# Netlify Dashboard → Functions → __csp-violations
+# Vercel Dashboard → Functions → __csp-violations
 
 # Review recent changes
 git log --oneline -10
@@ -399,7 +399,7 @@ git diff HEAD~1
 npx lighthouse https://dobeu.net --view
 
 # Check CDN cache hit rate
-# Netlify Dashboard → Analytics → Bandwidth
+# Vercel Dashboard → Analytics → Bandwidth
 
 # Check bundle size
 npm run build
@@ -444,26 +444,26 @@ npx vite-bundle-visualizer
 
 ```bash
 # Check deployment status
-netlify status
+vercel inspect
 
 # View recent deploys
-netlify deploy:list
+vercel ls
 
 # View function logs (last 100 lines)
-netlify logs:function --name=<function-name>
+vercel logs --follow
 
 # View deploy logs
-netlify logs:deploy
+vercel logs
 
 # List environment variables
-netlify env:list
+vercel env ls
 
 # Test function locally
 netlify dev
 
 # Deploy to production
-export NETLIFY_AUTH_TOKEN="<token>"
-netlify deploy --prod --dir=dist
+export VERCEL_TOKEN="<token>"
+vercel deploy --prod --dir=dist
 ```
 
 ### Supabase Postgres (db-dobeutech-unified)
@@ -549,10 +549,10 @@ ls -lh dist/assets/*.js
 
 ```bash
 # Via Netlify CLI
-netlify rollback
+vercel rollback
 
-# Or via Netlify Dashboard
-# 1. Go to: https://app.netlify.com/projects/dobeutech/deploys
+# Or via Vercel Dashboard
+# 1. Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 # 2. Find last successful deploy
 # 3. Click "Publish deploy"
 ```
@@ -571,7 +571,7 @@ git push origin main
 git reset --hard <commit-hash>
 git push origin main --force
 
-# Netlify will auto-deploy
+# Vercel will auto-deploy
 ```
 
 ### Database Rollback
@@ -631,7 +631,7 @@ git push origin main --force
 
 **External Support**
 
-- Netlify Support: https://www.netlify.com/support/
+- Vercel Support: https://www.vercel.com/help
 - Supabase Support: https://supabase.com/support
 - Auth0 Support: https://support.auth0.com/
 
@@ -656,13 +656,13 @@ npx tsc --noEmit
 npm run build
 
 # 5. Verify environment variables
-netlify env:list
+vercel env ls
 
 # 6. Run deployment checklist
 node scripts/deploy-checklist.js
 
 # 7. Deploy to production
-netlify deploy --prod --dir=dist
+vercel deploy --prod --dir=dist
 ```
 
 ---
@@ -696,7 +696,7 @@ After resolving an incident:
 ## Useful Links
 
 - **Production Site:** https://dobeu.net
-- **Netlify Dashboard:** https://app.netlify.com/projects/dobeutech
+- **Vercel Dashboard:** https://vercel.com/dobeutechnology/dobeunet-vercel
 - **Supabase Postgres (db-dobeutech-unified):** https://supabase.com/dashboard/
 - **Auth0 Dashboard:** https://manage.auth0.com/
 - **PostHog:** https://us.posthog.com/

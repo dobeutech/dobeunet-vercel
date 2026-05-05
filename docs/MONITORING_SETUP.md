@@ -17,7 +17,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Setup Slack Integration:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Go to: Site Settings → Build & Deploy → Deploy notifications
 # 2. Click "Add notification"
 # 3. Select "Slack"
@@ -31,7 +31,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Email Notifications:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Site Settings → Build & Deploy → Deploy notifications
 # 2. Add notification → Email
 # 3. Add emails: oncall@dobeu.wtf, engineering@dobeu.wtf
@@ -45,7 +45,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 ```bash
 # In netlify.toml
 [functions]
-  node_bundler = "esbuild"
+
 
 [functions.settings]
   # Log all function invocations
@@ -55,7 +55,7 @@ This guide covers setting up monitoring, alerting, and observability for the pro
 **Set Up Alerts:**
 
 ```bash
-# Via Netlify Dashboard
+# Via Vercel Dashboard
 # 1. Functions → Select function
 # 2. Metrics → Set up alerts
 # 3. Configure:

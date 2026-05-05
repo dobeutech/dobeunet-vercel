@@ -21,28 +21,28 @@
 
 ```bash
 curl -I https://dobeu.net
-netlify rollback
+vercel rollback
 ```
 
 ### Auth Broken
 
 ```bash
 curl https://status.auth0.com/api/v2/status.json
-netlify logs:function --name=_auth0 | tail -20
+vercel logs --follow | tail -20
 ```
 
 ### Database Down
 
 ```bash
 # Check Supabase status: https://status.supabase.com/
-netlify logs:function --name=projects | grep -i supabase
+vercel logs --follow | grep -i supabase
 ```
 
 ---
 
 ## 📊 DASHBOARDS (Check in Order)
 
-1. **Netlify:** https://app.netlify.com/projects/dobeutech
+1. **Netlify:** https://vercel.com/dobeutechnology/dobeunet-vercel
 2. **PostHog:** https://us.posthog.com/
 3. **Supabase:** https://supabase.com/dashboard/
 4. **Auth0:** https://manage.auth0.com/
@@ -56,7 +56,7 @@ netlify logs:function --name=projects | grep -i supabase
 ```bash
 # All-in-one health check
 curl -I https://dobeu.net && \
-netlify status && \
+vercel inspect && \
 echo "✅ Basic health OK"
 ```
 
@@ -64,23 +64,23 @@ echo "✅ Basic health OK"
 
 ```bash
 # Function logs (last 50 lines)
-netlify logs:function --name=<function-name> | tail -50
+vercel logs --follow | tail -50
 
 # Deploy logs
-netlify logs:deploy
+vercel logs
 
 # Filter for errors
-netlify logs:function --name=<function> | grep -i error
+vercel logs --follow | grep -i error
 ```
 
 ### Check Recent Deploys
 
 ```bash
 # List last 5 deploys
-netlify deploy:list | head -5
+vercel ls | head -5
 
 # Check current status
-netlify status
+vercel inspect
 ```
 
 ---
@@ -90,12 +90,12 @@ netlify status
 ### Method 1: CLI (Fastest)
 
 ```bash
-netlify rollback
+vercel rollback
 ```
 
 ### Method 2: Dashboard
 
-1. Go to: https://app.netlify.com/projects/dobeutech/deploys
+1. Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 2. Find last successful deploy
 3. Click "Publish deploy"
 
@@ -175,7 +175,7 @@ Follow-up: [Ticket link]
 ### Site Down
 
 ```bash
-netlify rollback
+vercel rollback
 ```
 
 ### Auth Errors
@@ -183,21 +183,21 @@ netlify rollback
 ```bash
 # Check Auth0 status first
 # If Auth0 is up, check env vars:
-netlify env:list | grep AUTH0
+vercel env ls | grep AUTH0
 ```
 
 ### Database Errors
 
 ```bash
 # Restart functions (redeploy)
-netlify deploy --prod
+vercel deploy --prod
 ```
 
 ### Build Failures
 
 ```bash
 # Check build logs
-netlify logs:deploy
+vercel logs
 
 # Reproduce locally
 npm run build
@@ -208,7 +208,7 @@ npm run build
 ```bash
 # Check PostHog: https://us.posthog.com/
 # If recent deploy, rollback:
-netlify rollback
+vercel rollback
 ```
 
 ---
@@ -233,13 +233,13 @@ netlify rollback
 
 ### Dashboards
 
-- Netlify: https://app.netlify.com/projects/dobeutech
+- Netlify: https://vercel.com/dobeutechnology/dobeunet-vercel
 - Supabase: https://supabase.com/dashboard/
 - PostHog: https://us.posthog.com/
 
 ### Status Pages
 
-- Netlify: https://www.netlifystatus.com/
+- Netlify: https://www.vercel-status.com/
 - Supabase: https://status.supabase.com/
 - Auth0: https://status.auth0.com/
 
@@ -277,7 +277,7 @@ Is site accessible?
 ### Netlify
 
 ```bash
-export NETLIFY_AUTH_TOKEN="<token>"
+export VERCEL_TOKEN="<token>"
 # Token stored in: 1Password / Secrets Manager
 ```
 
@@ -305,16 +305,16 @@ export NETLIFY_AUTH_TOKEN="<token>"
 curl -I https://dobeu.net
 
 # Rollback
-netlify rollback
+vercel rollback
 
 # Check errors
-netlify logs:function --name=projects | grep ERROR
+vercel logs --follow | grep ERROR
 
 # Deploy status
-netlify status
+vercel inspect
 
 # Recent deploys
-netlify deploy:list | head -5
+vercel ls | head -5
 
 # Test database
 psql "$SUPABASE_DB_URL" -c "SELECT 1;"
@@ -366,18 +366,18 @@ npx tsc --noEmit
 npm run build
 
 # Deploy
-netlify deploy --prod --dir=dist
+vercel deploy --prod --dir=dist
 ```
 
 ---
 
 ## 📞 EXTERNAL SUPPORT
 
-| Service  | Support                          |
-| -------- | -------------------------------- |
-| Netlify  | https://www.netlify.com/support/ |
-| Supabase | https://supabase.com/support     |
-| Auth0    | https://support.auth0.com/       |
+| Service  | Support                      |
+| -------- | ---------------------------- |
+| Netlify  | https://www.vercel.com/help  |
+| Supabase | https://supabase.com/support |
+| Auth0    | https://support.auth0.com/   |
 
 ---
 
@@ -401,9 +401,9 @@ netlify deploy --prod --dir=dist
 
 ---
 
-**Print Date:** ******\_\_******  
-**On-Call Period:** ******\_\_******  
-**Backup Contact:** ******\_\_******
+**Print Date:** **\*\***\_\_**\*\***  
+**On-Call Period:** **\*\***\_\_**\*\***  
+**Backup Contact:** **\*\***\_\_**\*\***
 
 ---
 

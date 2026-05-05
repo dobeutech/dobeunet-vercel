@@ -12,21 +12,21 @@
 # 1. Check if site is accessible
 curl -I https://dobeu.net
 
-# 2. Check Netlify deploy status
-netlify status
+# 2. Check Vercel deploy status
+vercel inspect
 
 # 3. Rollback immediately
-netlify rollback
+vercel rollback
 ```
 
 **If rollback doesn't work:**
 
 ```bash
 # Check last 5 deploys
-netlify deploy:list | head -5
+vercel ls | head -5
 
 # Publish specific deploy
-# Go to: https://app.netlify.com/projects/dobeutech/deploys
+# Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 # Click on last successful deploy → "Publish deploy"
 ```
 
@@ -45,20 +45,20 @@ netlify deploy:list | head -5
 curl https://status.auth0.com/api/v2/status.json
 
 # 2. Check Auth0 function logs
-netlify logs:function --name=_auth0 | tail -50
+vercel logs --follow | tail -50
 
 # 3. Verify env vars
-netlify env:list | grep AUTH0
+vercel env ls | grep AUTH0
 ```
 
 **Common Fixes:**
 
 ```bash
 # If env vars missing/wrong:
-netlify env:set AUTH0_DOMAIN <domain>
-netlify env:set AUTH0_CLIENT_ID <id>
-netlify env:set AUTH0_CLIENT_SECRET <secret>
-netlify deploy --prod
+vercel env add AUTH0_DOMAIN <domain>
+vercel env add AUTH0_CLIENT_ID <id>
+vercel env add AUTH0_CLIENT_SECRET <secret>
+vercel deploy --prod
 
 # If Auth0 is down:
 # - Check status page
@@ -113,7 +113,7 @@ vercel deploy --prod
 # Visit: https://us.posthog.com/
 
 # 2. Check function logs
-netlify logs:function --name=<function> | grep ERROR
+vercel logs --follow | grep ERROR
 
 # 3. Check recent deploys
 git log --oneline -5
@@ -123,10 +123,10 @@ git log --oneline -5
 
 ```bash
 # If recent deploy caused it:
-netlify rollback
+vercel rollback
 
 # If CSP blocking resources:
-# 1. Check violations: Vercel → Project → Functions → Logs
+# 1. Check CSP violations in Vercel logs
 # 2. Update CSP in vercel.json
 # 3. Redeploy
 
@@ -150,7 +150,7 @@ npx lighthouse https://dobeu.net --output=json
 time curl -s https://dobeu.net > /dev/null
 
 # 3. Check CDN cache hit rate
-# Netlify Dashboard → Analytics → Bandwidth
+# Vercel Dashboard → Analytics → Bandwidth
 ```
 
 **Common Fixes:**
@@ -179,7 +179,7 @@ ls -lh dist/assets/*.js
 
 ```bash
 # 1. Check build logs
-netlify logs:deploy
+vercel logs
 
 # 2. Reproduce locally
 npm run build
@@ -203,7 +203,7 @@ npx tsc --noEmit
 # - Add: NODE_OPTIONS="--max-old-space-size=4096"
 
 # If env vars missing:
-netlify env:list
+vercel env ls
 # Add missing vars
 ```
 
@@ -213,8 +213,8 @@ netlify env:list
 
 **Check these in order:**
 
-1. **Netlify Dashboard**
-   - URL: https://app.netlify.com/projects/dobeutech
+1. **Vercel Dashboard**
+   - URL: https://vercel.com/dobeutechnology/dobeunet-vercel
    - Check: Deploy status, function errors, bandwidth
 
 2. **PostHog**
@@ -235,11 +235,11 @@ netlify env:list
 ## 🔄 Standard Rollback
 
 ```bash
-# Method 1: Netlify CLI (fastest)
-netlify rollback
+# Method 1: Vercel CLI (fastest)
+vercel rollback
 
-# Method 2: Netlify Dashboard
-# 1. Go to: https://app.netlify.com/projects/dobeutech/deploys
+# Method 2: Vercel Dashboard
+# 1. Go to: https://vercel.com/dobeutechnology/dobeunet-vercel/deploys
 # 2. Find last successful deploy
 # 3. Click "Publish deploy"
 
@@ -309,20 +309,20 @@ Follow-up: [Ticket/postmortem link]
 curl -I https://dobeu.net && echo "✅ Site up"
 
 # Quick health check
-netlify status && echo "✅ Netlify OK"
+vercel inspect && echo "✅ Vercel OK"
 
 # View recent errors
-netlify logs:function --name=<function> | grep ERROR | tail -20
+vercel logs --follow | grep ERROR | tail -20
 
 # Test database connection
 psql "$SUPABASE_DB_URL" -c "SELECT 1;"
 
 # Deploy to production
-export NETLIFY_AUTH_TOKEN="<token>"
-netlify deploy --prod --dir=dist
+export VERCEL_TOKEN="<token>"
+vercel deploy --prod --dir=dist
 
 # Emergency rollback
-netlify rollback && echo "✅ Rolled back"
+vercel rollback && echo "✅ Rolled back"
 ```
 
 ---
